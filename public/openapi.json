@@ -1,0 +1,52 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Top GUN GEO-Lens API",
+    "description": "Professional auditing for Generative Engine Optimization (GEO). Measures brand visibility and citations in LLM search results.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://top-gun-live.vercel.app",
+      "description": "Production server managed by Wilfred L. Lee Jr."
+    }
+  ],
+  "paths": {
+    "/api/v1/audit": {
+      "get": {
+        "summary": "Perform a GEO visibility audit",
+        "operationId": "getGeoAudit",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The brand or topic to audit for LLM visibility",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Audit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "visibility_score": { "type": "string" },
+                    "top_citations":    { "type": "array", "items": { "type": "string" } },
+                    "llm_index_status": { "type": "string" },
+                    "provider":         { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required - $1.50 USD per request"
+          }
+        }
+      }
+    }
+  }
+}
