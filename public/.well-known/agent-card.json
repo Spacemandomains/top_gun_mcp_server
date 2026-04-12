@@ -2,10 +2,10 @@
   "name": "Top GUN — GEO-Lens Audit Agent",
   "description": "Agent that audits brand visibility across Large Language Models. Given a brand, product, or topic, it returns a visibility score, top citation URLs, LLM index status, and actionable GEO recommendations.",
   "version": "1.0.0",
-  "url": "https://top-gun-live.vercel.app",
+  "url": "https://top-gun-mcp-server.vercel.app",
   "provider": {
     "organization": "Top GUN GEO-Lens",
-    "url": "https://top-gun-live.vercel.app"
+    "url": "https://top-gun-mcp-server.vercel.app"
   },
   "capabilities": {
     "streaming": true,
@@ -34,12 +34,12 @@
     "checkout_url": "https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05"
   },
   "endpoints": {
-    "mcp": "https://top-gun-live.vercel.app/api/mcp",
-    "rest": "https://top-gun-live.vercel.app/api/v1/audit"
+    "mcp": "https://top-gun-mcp-server.vercel.app/api/mcp",
+    "rest": "https://top-gun-mcp-server.vercel.app/api/v1/audit"
   },
   "discovery": {
-    "server_card": "https://top-gun-live.vercel.app/.well-known/server-card.json",
-    "llms_txt": "https://top-gun-live.vercel.app/llms.txt",
-    "openapi": "https://top-gun-live.vercel.app/openapi.json"
+    "server_card": "https://top-gun-mcp-server.vercel.app/.well-known/server-card.json",
+    "llms_txt": "https://top-gun-mcp-server.vercel.app/llms.txt",
+    "openapi": "https://top-gun-mcp-server.vercel.app/openapi.json"
   }
 }
