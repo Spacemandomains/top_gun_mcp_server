@@ -8,7 +8,7 @@ import { randomUUID } from "crypto";
 // ─────────────────────────────────────────────
 //  CONFIG
 // ─────────────────────────────────────────────
-const SERVER_URL        = (process.env.SERVER_URL || "https://top-gun-live.vercel.app").replace(/\/$/, "");
+const SERVER_URL        = (process.env.SERVER_URL || "https://top-gun-mcp-server.vercel.app").replace(/\/$/, "");
 const STRIPE_KEY        = process.env.STRIPE_SECRET_KEY  || "";
 const STRIPE_PAYMENT_URL= process.env.STRIPE_PAYMENT_URL || "https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05";
 const BRAVE_KEY         = process.env.BRAVE_SEARCH_API_KEY || "";

@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://top-gun-live.vercel.app",
+      "url": "https://top-gun-mcp-server.vercel.app",
       "description": "Production server managed by Wilfred L. Lee Jr."
     }
   ],

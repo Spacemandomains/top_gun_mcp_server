@@ -1,6 +1,6 @@
 {
   "name": "Top GUN GEO-Lens by Wilfred L. Lee Jr.",
-  "api_url": "https://top-gun-live.vercel.app/api/v1/audit",
+  "api_url": "https://top-gun-mcp-server.vercel.app/api/v1/audit",
   "protocol": "Stripe-MPP",
   "pricing": "1.50 USD",
   "lookup_key": "top_gun_audit_v1"
