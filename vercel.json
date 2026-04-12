@@ -5,9 +5,9 @@
     { "src": "api/**/*.ts", "use": "@vercel/node"   }
   ],
   "routes": [
-    { "src": "/api/mcp(.*)", "dest": "/api/mcp/index.ts"       },
-    { "src": "/api/(.*)",    "dest": "/api/$1"                  },
-    { "src": "/.well-known/(.*)", "dest": "/public/.well-known/$1" },
-    { "src": "/(.*)",        "dest": "/public/$1"               }
+    { "src": "/api/mcp(.*)",      "dest": "/api/mcp/index.ts"       },
+    { "src": "/api/(.*)",         "dest": "/api/$1"                  },
+    { "src": "/.well-known/(.*)", "dest": "/public/.well-known/$1"   },
+    { "src": "/(.*)",             "dest": "/public/$1"               }
   ]
 }

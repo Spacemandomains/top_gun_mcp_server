@@ -276,10 +276,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   );
 
-  const transport = new StreamableHTTPServerTransport({
-    sessionId:     randomUUID(),
-    enableJsonRpc: true,
-  });
+  const transport = new StreamableHTTPServerTransport({});
 
   await mcp.connect(transport);
   await transport.handleRequest(req, res, req.body);
