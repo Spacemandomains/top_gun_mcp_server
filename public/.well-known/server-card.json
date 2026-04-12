@@ -1,0 +1,32 @@
+{
+  "name": "Top GUN — GEO-Lens Audit API",
+  "description": "Audits brand visibility across Large Language Models. Discover how your brand, product, or company is being surfaced and cited by AI systems. Returns a visibility score, top citation URLs, LLM index status, and actionable GEO recommendations.",
+  "version": "1.0.0",
+  "url": "https://top-gun-live.vercel.app",
+  "mcp_endpoint": "https://top-gun-live.vercel.app/api/mcp",
+  "transport": ["streamable-http"],
+  "spec_version": "2025-03-26",
+  "capabilities": {
+    "tools": true,
+    "payments": { "protocol": "stripe-mpp" }
+  },
+  "tools": [
+    {
+      "name": "audit_brand_visibility",
+      "price": "$1.50",
+      "description": "Audit how a brand or topic is represented and cited across LLM-indexed sources. Returns visibility score, citations, index status, and improvement recommendations."
+    }
+  ],
+  "use_cases": [
+    "Brand managers checking LLM visibility before campaigns",
+    "SEO and GEO professionals auditing client presence in AI search",
+    "Marketers comparing brand visibility to competitors",
+    "Agents that help users improve their AI search presence",
+    "Product teams monitoring how their product is described by AI"
+  ],
+  "discovery": {
+    "server_card": "https://top-gun-live.vercel.app/.well-known/server-card.json",
+    "llms_txt": "https://top-gun-live.vercel.app/llms.txt",
+    "agent_card": "https://top-gun-live.vercel.app/.well-known/agent-card.json"
+  }
+}

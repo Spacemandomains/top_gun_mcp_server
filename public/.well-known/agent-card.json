@@ -1,0 +1,45 @@
+{
+  "name": "Top GUN — GEO-Lens Audit Agent",
+  "description": "Agent that audits brand visibility across Large Language Models. Given a brand, product, or topic, it returns a visibility score, top citation URLs, LLM index status, and actionable GEO recommendations.",
+  "version": "1.0.0",
+  "url": "https://top-gun-live.vercel.app",
+  "provider": {
+    "organization": "Top GUN GEO-Lens",
+    "url": "https://top-gun-live.vercel.app"
+  },
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "defaultInputModes": ["text"],
+  "defaultOutputModes": ["text"],
+  "skills": [
+    {
+      "id": "audit_brand_visibility",
+      "name": "audit_brand_visibility",
+      "description": "Audits how a brand, product, or company is represented and cited across Large Language Model search results. Searches LLM-indexed sources (Brave Search + Exa) and measures how prominently the query appears. Returns: visibility score out of 100, score label (Strong/Moderate/Weak/Not Found), top citation URLs, LLM index status, sources checked, and actionable GEO recommendations. COST: $1.50 via Stripe MPP.",
+      "tags": ["geo", "llm", "seo", "brand", "visibility", "audit"],
+      "examples": [
+        "Audit brand visibility for 'Nike'",
+        "How visible is 'Notion' in LLM search results?",
+        "Check LLM presence of 'Hawaii surf schools'"
+      ],
+      "inputModes": ["text"],
+      "outputModes": ["text"]
+    }
+  ],
+  "pricing": {
+    "protocol": "stripe-mpp",
+    "per_call_usd": "1.50",
+    "checkout_url": "https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05"
+  },
+  "endpoints": {
+    "mcp": "https://top-gun-live.vercel.app/api/mcp",
+    "rest": "https://top-gun-live.vercel.app/api/v1/audit"
+  },
+  "discovery": {
+    "server_card": "https://top-gun-live.vercel.app/.well-known/server-card.json",
+    "llms_txt": "https://top-gun-live.vercel.app/llms.txt",
+    "openapi": "https://top-gun-live.vercel.app/openapi.json"
+  }
+}
