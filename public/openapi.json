@@ -19,9 +19,10 @@
         "operationId": "getGeoAudit",
         "x-payment-info": {
           "authMode": "paid",
-          "amount": 1.50,
+          "price": 1.50,
           "currency": "USD",
-          "protocol": "stripe-mpp",
+          "protocols": ["stripe-mpp"],
+          "paymentMethod": "card",
           "instructions": "Send X-Payment-Token header with a succeeded Stripe payment_intent_id. Omit to receive a 402 with a new payment_intent to complete."
         },
         "parameters": [
