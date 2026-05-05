@@ -20,7 +20,7 @@
         "x-payment-info": {
           "price": "1.50",
           "currency": "USD",
-          "protocols": ["x402", "stripe-mpp"]
+          "protocols": ["x402"]
         },
         "parameters": [
           {
