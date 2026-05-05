@@ -336,7 +336,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // ── Build stateless MCP server ───────────────
-  const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0" });
+  const mcp = new McpServer({
+    name:    "top-gun-geo-lens",
+    version: "1.0.0",
+    icons: [
+      {
+        src:   "https://top-gun-mcp-server.vercel.app/top-gun-favicon.png",
+        type:  "image/png",
+        sizes: "512x512",
+      },
+    ],
+  });
 
   mcp.tool(
     "audit_brand_visibility",
