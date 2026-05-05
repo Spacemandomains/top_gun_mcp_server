@@ -3,7 +3,8 @@
   "info": {
     "title": "Top GUN GEO-Lens API",
     "description": "Professional auditing for Generative Engine Optimization (GEO). Measures brand visibility and citations in LLM search results.",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "x-guidance": "This API audits brand and topic visibility across Large Language Models. Call GET /api/v1/audit?query=<brand> to receive a visibility score (0-100), top citation URLs, LLM index status, and actionable GEO recommendations. Payment of $1.50 USD is required per request via Stripe MPP. If no X-Payment-Token header is provided, the server returns HTTP 402 with a Stripe payment_intent. Complete payment, then retry with the X-Payment-Token header set to the payment_intent_id."
   },
   "servers": [
     {
@@ -16,6 +17,13 @@
       "get": {
         "summary": "Perform a GEO visibility audit",
         "operationId": "getGeoAudit",
+        "x-payment-info": {
+          "authMode": "paid",
+          "price": "$1.50",
+          "currency": "USD",
+          "protocol": "stripe-mpp",
+          "instructions": "Send X-Payment-Token header with a succeeded Stripe payment_intent_id. Omit to receive a 402 with a new payment_intent to complete."
+        },
         "parameters": [
           {
             "name": "query",
