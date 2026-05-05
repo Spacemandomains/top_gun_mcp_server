@@ -11,10 +11,9 @@
     { "src": "/openapi.json",     "dest": "/public/openapi.json"  },
     { "src": "/ai-agents.json",   "dest": "/public/ai-agents.json"},
     { "src": "/llms.txt",         "dest": "/public/llms.txt"      },
-    { "src": "/index.html",                  "dest": "/public/index.html"                  },
-    { "src": "/top-gun-favicon.png",         "dest": "/public/top-gun-favicon.png"         },
-    { "src": "/Gemini_Generated_Image_.png", "dest": "/public/Gemini_Generated_Image_.png" },
-    { "src": "/",                 "dest": "/api/mcp/index.ts"     },
+    { "src": "/index.html",       "dest": "/public/index.html"    },
+    { "src": "/top-gun-favicon.png", "dest": "/public/top-gun-favicon.png" },
+    { "src": "/",                 "dest": "/public/index.html"    },
     { "src": "/(.*)",             "dest": "/public/$1"            }
   ]
 }
