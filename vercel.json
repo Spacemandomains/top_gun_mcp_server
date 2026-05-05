@@ -5,9 +5,14 @@
     { "src": "api/**/*.ts", "use": "@vercel/node"   }
   ],
   "routes": [
-    { "src": "/api/mcp(.*)",      "dest": "/api/mcp/index.ts"       },
-    { "src": "/api/(.*)",         "dest": "/api/$1"                  },
-    { "src": "/.well-known/(.*)", "dest": "/public/.well-known/$1"   },
-    { "src": "/(.*)",             "dest": "/public/$1"               }
+    { "src": "/api/mcp(.*)",      "dest": "/api/mcp/index.ts"     },
+    { "src": "/api/(.*)",         "dest": "/api/$1"               },
+    { "src": "/.well-known/(.*)", "dest": "/public/.well-known/$1"},
+    { "src": "/openapi.json",     "dest": "/public/openapi.json"  },
+    { "src": "/ai-agents.json",   "dest": "/public/ai-agents.json"},
+    { "src": "/llms.txt",         "dest": "/public/llms.txt"      },
+    { "src": "/index.html",       "dest": "/public/index.html"    },
+    { "src": "/",                 "dest": "/api/mcp/index.ts"     },
+    { "src": "/(.*)",             "dest": "/public/$1"            }
   ]
 }
