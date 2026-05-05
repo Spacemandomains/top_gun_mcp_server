@@ -18,7 +18,7 @@
         "summary": "Perform a GEO visibility audit",
         "operationId": "getGeoAudit",
         "x-payment-info": {
-          "price": 1.50,
+          "price": "1.50",
           "currency": "USD",
           "protocols": ["x402", "stripe-mpp"]
         },
