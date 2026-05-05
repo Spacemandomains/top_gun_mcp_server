@@ -4,7 +4,7 @@
     "title": "Top GUN GEO-Lens API",
     "description": "Professional auditing for Generative Engine Optimization (GEO). Measures brand visibility and citations in LLM search results.",
     "version": "1.0.0",
-    "x-guidance": "This API audits brand and topic visibility across Large Language Models. Call GET /api/v1/audit?query=<brand> to receive a visibility score (0-100), top citation URLs, LLM index status, and actionable GEO recommendations. Payment of $1.50 USD is required per request via Stripe MPP. If no X-Payment-Token header is provided, the server returns HTTP 402 with a Stripe payment_intent. Complete payment, then retry with the X-Payment-Token header set to the payment_intent_id."
+    "guidance": "This API audits brand and topic visibility across Large Language Models. Call GET /api/v1/audit?query=<brand> to receive a visibility score (0-100), top citation URLs, LLM index status, and actionable GEO recommendations. Payment of $1.50 USD is required per request. If no payment credential is provided, the server returns HTTP 402 with payment instructions. Complete payment, then retry with the required payment credential."
   },
   "servers": [
     {
@@ -18,9 +18,10 @@
         "summary": "Perform a GEO visibility audit",
         "operationId": "getGeoAudit",
         "x-payment-info": {
+          "pricingMode": "fixed",
           "price": "1.50",
           "currency": "USD",
-          "protocols": ["x402"]
+          "protocols": ["mpp-tempo-1"]
         },
         "parameters": [
           {
@@ -28,7 +29,9 @@
             "in": "query",
             "description": "The brand or topic to audit for LLM visibility",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -39,10 +42,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "visibility_score": { "type": "string" },
-                    "top_citations":    { "type": "array", "items": { "type": "string" } },
-                    "llm_index_status": { "type": "string" },
-                    "provider":         { "type": "string" }
+                    "visibility_score": {
+                      "type": "string"
+                    },
+                    "top_citations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "llm_index_status": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string"
+                    }
                   }
                 }
               }
