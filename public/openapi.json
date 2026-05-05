@@ -18,25 +18,9 @@
         "summary": "Perform a GEO visibility audit",
         "operationId": "getGeoAudit",
         "x-payment-info": {
-          "authMode": "paid",
           "price": 1.50,
           "currency": "USD",
-          "protocols": ["stripe-mpp", "x402"],
-          "paymentMethods": [
-            {
-              "method": "card",
-              "protocol": "stripe-mpp",
-              "instructions": "Omit X-Payment-Token to receive a 402 with a Stripe payment_intent. Complete payment, then retry with header: X-Payment-Token: <payment_intent_id>"
-            },
-            {
-              "method": "crypto",
-              "protocol": "x402",
-              "asset": "USDC",
-              "network": "base",
-              "amount": 1.50,
-              "instructions": "Pay 1.50 USDC on Base mainnet, then retry with header: X-Payment: <encoded_payload>"
-            }
-          ]
+          "protocols": ["x402", "stripe-mpp"]
         },
         "parameters": [
           {
