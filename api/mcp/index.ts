@@ -3,7 +3,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 import Stripe from "stripe";
-import { randomUUID } from "crypto";
 
 // ─────────────────────────────────────────────
 //  CONFIG
@@ -203,7 +202,7 @@ const serverCard = {
     "Product teams monitoring how their product is described by AI",
   ],
   discovery: {
-    server_card: `${SERVER_URL}/api/mcp/.well-known/server-card.json`,
+    server_card: `${SERVER_URL}/.well-known/server-card.json`,
     llms_txt:    `${SERVER_URL}/llms.txt`,
     agent_card:  `${SERVER_URL}/.well-known/agent-card.json`,
   },
@@ -214,12 +213,18 @@ const serverCard = {
 // ─────────────────────────────────────────────
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin",  "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers",
     "Content-Type, Authorization, X-Payment-Token, mcp-session-id"
   );
+  res.setHeader("Access-Control-Expose-Headers", "mcp-session-id");
 
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  // ── DELETE: session termination (stateless — nothing to clean up) ───
+  if (req.method === "DELETE") {
+    return res.status(200).end();
+  }
 
   // ── Serve server card at well-known path ────
   const path = (req.url || "").split("?")[0];
@@ -276,7 +281,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   );
 
-  const transport = new StreamableHTTPServerTransport({});
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 
   await mcp.connect(transport);
   await transport.handleRequest(req, res, req.body);
