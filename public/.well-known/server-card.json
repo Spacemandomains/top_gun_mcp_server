@@ -8,7 +8,7 @@
   "spec_version": "2025-03-26",
   "capabilities": {
     "tools": true,
-    "payments": { "protocol": "stripe-mpp" }
+    "payments": { "protocols": ["stripe-mpp", "x402"] }
   },
   "tools": [
     {
