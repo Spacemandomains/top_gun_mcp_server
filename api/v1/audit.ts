@@ -3,11 +3,52 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 const STRIPE_PAYMENT_URL = process.env.STRIPE_PAYMENT_URL ||
   "https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05";
 const STRIPE_SECRET_KEY  = process.env.STRIPE_SECRET_KEY || "";
+const USDC_WALLET        = process.env.USDC_WALLET_ADDRESS || "";
+const USDC_ASSET         = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // USDC on Base
+const USDC_AMOUNT        = "1500000"; // $1.50 — USDC has 6 decimals
+const SERVER_URL         = (process.env.SERVER_URL || "https://top-gun-mcp-server.vercel.app").replace(/\/$/, "");
+
+function x402Requirements(resource: string) {
+  return {
+    scheme:            "exact",
+    network:           "base",
+    maxAmountRequired: USDC_AMOUNT,
+    resource,
+    description:       "Top GUN GEO-Lens Brand Visibility Audit",
+    mimeType:          "application/json",
+    payTo:             USDC_WALLET,
+    maxTimeoutSeconds: 300,
+    asset:             USDC_ASSET,
+    extra:             { name: "USD Coin", version: "2" },
+  };
+}
+
+async function verifyX402(payment: string, resource: string): Promise<boolean> {
+  if (!USDC_WALLET) return false;
+  try {
+    const res  = await fetch("https://x402.org/facilitator/verify", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ payment, paymentRequirements: x402Requirements(resource) }),
+    });
+    const data = await res.json();
+    return data.isValid === true;
+  } catch { return false; }
+}
+
+async function settleX402(payment: string, resource: string): Promise<void> {
+  if (!USDC_WALLET) return;
+  await fetch("https://x402.org/facilitator/settle", {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ payment, paymentRequirements: x402Requirements(resource) }),
+  }).catch(() => {});
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin",  "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment-Token");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Payment-Token, X-Payment");
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET")     return res.status(405).json({ error: "Method Not Allowed" });
@@ -21,23 +62,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // ── Payment gate ────────────────────────────────────────
+  const resource     = `${SERVER_URL}/api/v1/audit`;
+  const x402Payment  = req.headers["x-payment"] as string | undefined;
   const paymentToken = req.headers["x-payment-token"] as string | undefined;
 
-  if (!paymentToken) {
+  // x402 USDC path
+  if (x402Payment) {
+    if (!USDC_WALLET) {
+      return res.status(402).json({ error: "usdc_not_configured" });
+    }
+    const valid = await verifyX402(x402Payment, resource);
+    if (!valid) {
+      return res.status(402).json({ error: "invalid_x402_payment" });
+    }
+    void settleX402(x402Payment, resource);
+  } else if (!paymentToken) {
     return res.status(402).json({
-      error:       "Payment Required",
-      amount:      1.50,
-      payment_url: STRIPE_PAYMENT_URL,
-      instructions: [
-        "1. Complete payment at the payment_url above",
-        "2. Copy the session_id from the redirect URL",
-        "3. Retry this request with header: X-Payment-Token: <session_id>",
+      error:     "Payment Required",
+      price_usd: "$1.50",
+      payment_options: [
+        {
+          method:       "stripe-mpp",
+          payment_url:  STRIPE_PAYMENT_URL,
+          instructions: [
+            "1. Complete payment at payment_url",
+            "2. Copy the session_id from the redirect URL",
+            "3. Retry with header: X-Payment-Token: <session_id>",
+          ],
+        },
+        ...(USDC_WALLET ? [{
+          method:       "x402",
+          network:      "base",
+          asset:        "USDC",
+          amount:       "1.50",
+          payTo:        USDC_WALLET,
+          requirements: x402Requirements(resource),
+          instructions: "Pay 1.50 USDC on Base, then retry with header: X-Payment: <encoded_payload>",
+        }] : []),
       ],
     });
-  }
-
-  // ── Verify Stripe session (if key is configured) ────────
-  if (STRIPE_SECRET_KEY) {
+  } else if (STRIPE_SECRET_KEY) {
+    // ── Verify Stripe session ──────────────────
     try {
       const Stripe  = (await import("stripe")).default;
       const stripe  = new Stripe(STRIPE_SECRET_KEY);

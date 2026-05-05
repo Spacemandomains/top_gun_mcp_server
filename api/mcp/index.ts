@@ -15,8 +15,52 @@ const EXA_KEY           = process.env.EXA_API_KEY          || "";
 
 const stripe = STRIPE_KEY ? new Stripe(STRIPE_KEY) : null;
 
-// Tool price in cents
-const AUDIT_PRICE_CENTS = 150; // $1.50
+// Tool price in cents (Stripe) and USDC units (6 decimals)
+const AUDIT_PRICE_CENTS = 150;       // $1.50
+const AUDIT_PRICE_USDC  = "1500000"; // $1.50 — USDC has 6 decimals
+
+// ─────────────────────────────────────────────
+//  X402 USDC PAYMENT  (USDC on Base)
+// ─────────────────────────────────────────────
+const USDC_WALLET = process.env.USDC_WALLET_ADDRESS || "";
+const USDC_ASSET  = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // USDC on Base mainnet
+
+function x402Requirements(resource: string) {
+  return {
+    scheme:            "exact",
+    network:           "base",
+    maxAmountRequired: AUDIT_PRICE_USDC,
+    resource,
+    description:       "Top GUN GEO-Lens Brand Visibility Audit",
+    mimeType:          "application/json",
+    payTo:             USDC_WALLET,
+    maxTimeoutSeconds: 300,
+    asset:             USDC_ASSET,
+    extra:             { name: "USD Coin", version: "2" },
+  };
+}
+
+async function verifyX402(payment: string, resource: string): Promise<boolean> {
+  if (!USDC_WALLET) return false;
+  try {
+    const res  = await fetch("https://x402.org/facilitator/verify", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ payment, paymentRequirements: x402Requirements(resource) }),
+    });
+    const data = await res.json();
+    return data.isValid === true;
+  } catch { return false; }
+}
+
+async function settleX402(payment: string, resource: string): Promise<void> {
+  if (!USDC_WALLET) return;
+  await fetch("https://x402.org/facilitator/settle", {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ payment, paymentRequirements: x402Requirements(resource) }),
+  }).catch(() => {});
+}
 
 // ─────────────────────────────────────────────
 //  GEO AUDIT ENGINE  (shared with REST endpoint)
@@ -123,10 +167,29 @@ async function runGeoAudit(query: string) {
 }
 
 // ─────────────────────────────────────────────
-//  STRIPE MPP PAYMENT GATE
+//  PAYMENT GATE  (Stripe MPP card  +  x402 USDC)
 // ─────────────────────────────────────────────
 async function requirePayment(req: VercelRequest, res: VercelResponse): Promise<boolean> {
-  if (!stripe) return true; // dev mode — no key configured
+  const resource    = `${SERVER_URL}/api/mcp`;
+  const x402Payment = req.headers["x-payment"] as string | undefined;
+
+  // ── x402 USDC path ──────────────────────────
+  if (x402Payment) {
+    if (!USDC_WALLET) {
+      res.status(402).json({ error: "usdc_not_configured" });
+      return false;
+    }
+    const valid = await verifyX402(x402Payment, resource);
+    if (!valid) {
+      res.status(402).json({ error: "invalid_x402_payment" });
+      return false;
+    }
+    void settleX402(x402Payment, resource);
+    return true;
+  }
+
+  // ── Stripe MPP path ─────────────────────────
+  if (!stripe) return true; // dev mode — no keys configured
 
   const token = req.headers["x-payment-token"] as string | undefined;
 
@@ -137,17 +200,31 @@ async function requirePayment(req: VercelRequest, res: VercelResponse): Promise<
       metadata: { mcp_tool: "audit_brand_visibility", server: "top-gun-geo-lens" },
     });
     res.status(402).json({
-      error:            "payment_required",
-      payment_protocol: "stripe-mpp",
-      price_usd:        "$1.50",
-      payment_intent: {
-        id:            intent.id,
-        client_secret: intent.client_secret,
-        amount:        intent.amount,
-        currency:      intent.currency,
-      },
-      stripe_checkout: STRIPE_PAYMENT_URL,
-      instructions:    "Complete payment, then retry with header: X-Payment-Token: <payment_intent_id>",
+      error:     "payment_required",
+      price_usd: "$1.50",
+      payment_options: [
+        {
+          method:           "stripe-mpp",
+          payment_protocol: "stripe-mpp",
+          payment_intent: {
+            id:            intent.id,
+            client_secret: intent.client_secret,
+            amount:        intent.amount,
+            currency:      intent.currency,
+          },
+          stripe_checkout: STRIPE_PAYMENT_URL,
+          instructions:    "Complete payment, then retry with header: X-Payment-Token: <payment_intent_id>",
+        },
+        ...(USDC_WALLET ? [{
+          method:       "x402",
+          network:      "base",
+          asset:        "USDC",
+          amount:       "1.50",
+          payTo:        USDC_WALLET,
+          requirements: x402Requirements(resource),
+          instructions: "Pay 1.50 USDC on Base, then retry with header: X-Payment: <encoded_payload>",
+        }] : []),
+      ],
     });
     return false;
   }
@@ -160,7 +237,6 @@ async function requirePayment(req: VercelRequest, res: VercelResponse): Promise<
     }
     return true;
   } catch {
-    // Also try as a Stripe Checkout session ID (from the web UI flow)
     try {
       const session = await stripe.checkout.sessions.retrieve(token);
       if (session.payment_status !== "paid") {
@@ -186,7 +262,7 @@ const serverCard = {
   mcp_endpoint: `${SERVER_URL}/api/mcp`,
   transport:    ["streamable-http"],
   spec_version: "2025-03-26",
-  capabilities: { tools: true, payments: { protocol: "stripe-mpp" } },
+  capabilities: { tools: true, payments: { protocols: ["stripe-mpp", "x402"] } },
   tools: [
     {
       name:        "audit_brand_visibility",
@@ -215,7 +291,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin",  "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Payment-Token, mcp-session-id"
+    "Content-Type, Authorization, X-Payment-Token, X-Payment, mcp-session-id"
   );
   res.setHeader("Access-Control-Expose-Headers", "mcp-session-id");
 
