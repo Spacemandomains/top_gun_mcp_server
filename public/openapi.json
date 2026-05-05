@@ -4,6 +4,10 @@
     "title": "Top GUN GEO-Lens API",
     "description": "Professional auditing for Generative Engine Optimization (GEO). Measures brand visibility and citations in LLM search results.",
     "version": "1.0.0",
+    "x-logo": {
+      "url": "https://top-gun-mcp-server.vercel.app/top-gun-favicon.png",
+      "altText": "Top GUN GEO-Lens API"
+    },
     "guidance": "This API audits brand and topic visibility across Large Language Models. Call GET /api/v1/audit?query=<brand> to receive a visibility score (0-100), top citation URLs, LLM index status, and actionable GEO recommendations. Payment of $1.50 USD is required per request. If no payment credential is provided, the server returns HTTP 402 with payment instructions. Complete payment, then retry with the required payment credential."
   },
   "servers": [
