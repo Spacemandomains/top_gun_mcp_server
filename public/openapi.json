@@ -27,6 +27,12 @@
           "currency": "USD",
           "protocols": ["mpp-tempo-1"]
         },
+        "x-payment": {
+          "mode": "fixed",
+          "amount": "1.50",
+          "currency": "USD",
+          "protocols": ["mpp-tempo-1"]
+        },
         "parameters": [
           {
             "name": "query",
