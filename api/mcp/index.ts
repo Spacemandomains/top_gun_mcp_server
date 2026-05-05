@@ -312,10 +312,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ── Only POST for MCP ───────────────────────
   if (req.method === "GET") {
     return res.status(200).json({
-      info:    "Top GUN GEO-Lens MCP Server",
-      connect: `POST ${SERVER_URL}/api/mcp`,
-      docs:    `${SERVER_URL}/llms.txt`,
-      card:    serverCard,
+      info:         "Top GUN GEO-Lens MCP Server",
+      mcp_endpoint: SERVER_URL,
+      alt_endpoint: `${SERVER_URL}/api/mcp`,
+      transport:    "streamable-http",
+      tools: ["audit_brand_visibility"],
+      docs:         `${SERVER_URL}/llms.txt`,
+      card:         serverCard,
     });
   }
 
