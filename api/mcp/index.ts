@@ -107,7 +107,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const toolName: string | undefined = req.body?.method === "tools/call" ? req.body?.params?.name : undefined;
   if (toolName === "audit_brand_visibility" || toolName === "geo_quick_check") { const ok = await requirePayment(req, res, toolName); if (!ok) return; }
 
-  const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0", description: fullDescription, icons: [{ src: `${SERVER_URL}/top-gun-favicon.png`, type: "image/png", sizes: "512x512" }] });
+  const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0", description: fullDescription, icons: [{ src: `${SERVER_URL}/top-gun-favicon.png`, type: "image/png", sizes: ["512x512"] }] });
 
   mcp.resource("top-gun-tools", "topgun://tools", async () => ({ contents: [{ uri: "topgun://tools", mimeType: "application/json", text: JSON.stringify(toolsAndPricing, null, 2) }] }));
   mcp.resource("top-gun-pricing", "topgun://pricing", async () => ({ contents: [{ uri: "topgun://pricing", mimeType: "application/json", text: JSON.stringify({ tools: [quickTool, auditTool] }, null, 2) }] }));
