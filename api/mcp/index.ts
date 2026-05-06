@@ -44,11 +44,65 @@ const quickTool = { name: "geo_quick_check", title: "GEO Quick Check", descripti
 const auditTool = { name: "audit_brand_visibility", title: "Audit Brand Visibility", description: fullDescription, inputSchema: { type: "object", required: ["query"], properties: { query: { type: "string", description: "The brand, product, company, or topic to audit for LLM visibility." } } }, ...paymentMetadata(AUDIT_PRICE_USD, AUDIT_PRICE_LABEL) };
 const toolAuditTool = { name: "tool_audit", title: "Audit MCP Tool or Endpoint", description: "Audit an MCP server, OpenAPI spec, or paid AI-agent endpoint for discoverability, schema quality, payment metadata, auth mode, 402 payment challenge quality, and MPP Scan readiness.", inputSchema: { type: "object", required: ["url"], properties: { url: { type: "string", format: "uri", description: "The public MCP server, OpenAPI spec, or endpoint URL to audit." } } }, ...paymentMetadata(AUDIT_PRICE_USD, AUDIT_PRICE_LABEL) };
 
-const resources = [
+const pricedResources = [
+  {
+    id: "tool_audit",
+    type: "tool",
+    name: "Top GUN GEO-Lens Audit",
+    title: "Top GUN GEO-Lens Audit",
+    uri: `${SERVER_URL}/api/v1/audit`,
+    description: "Professional auditing for Generative Engine Optimization. Measures brand visibility and citations in LLM search results.",
+    method: "GET",
+    path: "/api/v1/audit",
+    url: `${SERVER_URL}/api/v1/audit`,
+    price: AUDIT_PRICE_USD,
+    currency: "USD",
+    pricing: { type: "fixed", amount: AUDIT_PRICE_USD, currency: "USD", display: AUDIT_PRICE_LABEL, protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] },
+    "x-payment-info": { pricingMode: "fixed", price: AUDIT_PRICE_USD, currency: "USD", protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] },
+    inputSchema: { type: "object", required: ["url"], properties: { url: { type: "string", format: "uri", description: "The public MCP server, OpenAPI spec, endpoint, brand website, or URL to audit." } } },
+    mimeType: "application/json"
+  },
+  {
+    id: "geo_quick_check",
+    type: "tool",
+    name: "GEO Quick Check",
+    title: "GEO Quick Check",
+    uri: `${SERVER_URL}/api/mcp#geo_quick_check`,
+    description: "Fast preflight GEO check for agents before running a full audit.",
+    method: "POST",
+    path: "/api/mcp",
+    url: `${SERVER_URL}/api/mcp`,
+    price: QUICK_PRICE_USD,
+    currency: "USD",
+    pricing: { type: "fixed", amount: QUICK_PRICE_USD, currency: "USD", display: QUICK_PRICE_LABEL, protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] },
+    "x-payment-info": { pricingMode: "fixed", price: QUICK_PRICE_USD, currency: "USD", protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] },
+    mimeType: "application/json"
+  },
+  {
+    id: "audit_brand_visibility",
+    type: "tool",
+    name: "Audit Brand Visibility",
+    title: "Audit Brand Visibility",
+    uri: `${SERVER_URL}/api/mcp#audit_brand_visibility`,
+    description: "Audit how a brand or topic is represented and cited across LLM-indexed sources. Returns visibility score, citations, index status, and improvement recommendations.",
+    method: "POST",
+    path: "/api/mcp",
+    url: `${SERVER_URL}/api/mcp`,
+    price: AUDIT_PRICE_USD,
+    currency: "USD",
+    pricing: { type: "fixed", amount: AUDIT_PRICE_USD, currency: "USD", display: AUDIT_PRICE_LABEL, protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] },
+    "x-payment-info": { pricingMode: "fixed", price: AUDIT_PRICE_USD, currency: "USD", protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] },
+    mimeType: "application/json"
+  }
+];
+
+const infoResources = [
   { name: "Top GUN Tools and Pricing", uri: "topgun://tools", description: "Lists the paid MCP tools available from Top GUN GEO-Lens, including prices and when agents should call each tool.", mimeType: "application/json" },
   { name: "Top GUN Pricing", uri: "topgun://pricing", description: "Machine-readable pricing for Top GUN GEO-Lens MCP tools.", mimeType: "application/json" },
   { name: "Top GUN Description", uri: "topgun://description", description: "Marketplace description and use cases for Top GUN GEO-Lens.", mimeType: "text/plain" }
 ];
+
+const resources = [...pricedResources, ...infoResources];
 
 const toolsAndPricing = { tools: [quickTool, auditTool, toolAuditTool], recommended_flow: ["geo_quick_check", "audit_brand_visibility", "tool_audit"], mcp_endpoint: `${SERVER_URL}/api/mcp`, server: "Top GUN GEO-Lens API" };
 
@@ -116,6 +170,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   mcp.resource("top-gun-tools", "topgun://tools", async () => ({ contents: [{ uri: "topgun://tools", mimeType: "application/json", text: JSON.stringify(toolsAndPricing, null, 2) }] }));
   mcp.resource("top-gun-pricing", "topgun://pricing", async () => ({ contents: [{ uri: "topgun://pricing", mimeType: "application/json", text: JSON.stringify({ tools: [quickTool, auditTool] }, null, 2) }] }));
   mcp.resource("top-gun-description", "topgun://description", async () => ({ contents: [{ uri: "topgun://description", mimeType: "text/plain", text: fullDescription }] }));
+
+  const toolAuditResourceUri = `${SERVER_URL}/api/v1/audit`;
+  mcp.resource("tool_audit", toolAuditResourceUri, { description: `Top GUN GEO-Lens Audit — ${AUDIT_PRICE_LABEL} per call. ${fullDescription}`, mimeType: "application/json" }, async () => ({ contents: [{ uri: toolAuditResourceUri, mimeType: "application/json", text: JSON.stringify({ id: "tool_audit", method: "GET", path: "/api/v1/audit", url: toolAuditResourceUri, price: AUDIT_PRICE_USD, currency: "USD", pricing: { type: "fixed", amount: AUDIT_PRICE_USD, currency: "USD", display: AUDIT_PRICE_LABEL, protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] } }, null, 2) }] }));
+
+  const quickResourceUri = `${SERVER_URL}/api/mcp#geo_quick_check`;
+  mcp.resource("geo_quick_check", quickResourceUri, { description: `GEO Quick Check — ${QUICK_PRICE_LABEL} per call. ${quickDescription}`, mimeType: "application/json" }, async () => ({ contents: [{ uri: quickResourceUri, mimeType: "application/json", text: JSON.stringify({ id: "geo_quick_check", method: "POST", path: "/api/mcp", price: QUICK_PRICE_USD, currency: "USD", pricing: { type: "fixed", amount: QUICK_PRICE_USD, currency: "USD", display: QUICK_PRICE_LABEL, protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] } }, null, 2) }] }));
+
+  const auditBrandResourceUri = `${SERVER_URL}/api/mcp#audit_brand_visibility`;
+  mcp.resource("audit_brand_visibility", auditBrandResourceUri, { description: `Audit Brand Visibility — ${AUDIT_PRICE_LABEL} per call. ${fullDescription}`, mimeType: "application/json" }, async () => ({ contents: [{ uri: auditBrandResourceUri, mimeType: "application/json", text: JSON.stringify({ id: "audit_brand_visibility", method: "POST", path: "/api/mcp", price: AUDIT_PRICE_USD, currency: "USD", pricing: { type: "fixed", amount: AUDIT_PRICE_USD, currency: "USD", display: AUDIT_PRICE_LABEL, protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] } }, null, 2) }] }));
 
   mcp.tool("geo_quick_check", `${quickDescription} Cost: ${QUICK_PRICE_LABEL} per quick check.`, { query: z.string().describe("The brand, product, company, or topic to pre-check for LLM visibility."), context: z.string().optional().describe("Optional context about the brand, product, market, or user goal."), intent: z.enum(["brand_check", "content_planning", "competitor_check", "sales_research", "seo_geo"]).optional().describe("Why the agent is running this quick check.") }, async ({ query, context, intent }) => ({ content: [{ type: "text", text: JSON.stringify(runGeoQuickCheck(query, context, intent), null, 2) }] }));
   mcp.tool("audit_brand_visibility", `${fullDescription} Cost: ${AUDIT_PRICE_LABEL} per audit via Stripe MPP/x402.`, { query: z.string().describe("The brand name, product, company, or topic to audit for LLM visibility. Examples: 'Nike', 'Notion', 'Claude AI', 'Hawaii surf schools'") }, async ({ query }) => ({ content: [{ type: "text", text: JSON.stringify(await runGeoAudit(query), null, 2) }] }));
