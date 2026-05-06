@@ -109,9 +109,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0", description: fullDescription, icons: [{ src: `${SERVER_URL}/top-gun-favicon.png`, type: "image/png", sizes: "512x512" }] });
 
-  mcp.resource("top-gun-tools", ["topgun://tools"], async () => ({ contents: [{ uri: "topgun://tools", mimeType: "application/json", text: JSON.stringify(toolsAndPricing, null, 2) }] }));
-  mcp.resource("top-gun-pricing", ["topgun://pricing"], async () => ({ contents: [{ uri: "topgun://pricing", mimeType: "application/json", text: JSON.stringify({ tools: [quickTool, auditTool] }, null, 2) }] }));
-  mcp.resource("top-gun-description", ["topgun://description"], async () => ({ contents: [{ uri: "topgun://description", mimeType: "text/plain", text: fullDescription }] }));
+  mcp.resource("top-gun-tools", "topgun://tools", async () => ({ contents: [{ uri: "topgun://tools", mimeType: "application/json", text: JSON.stringify(toolsAndPricing, null, 2) }] }));
+  mcp.resource("top-gun-pricing", "topgun://pricing", async () => ({ contents: [{ uri: "topgun://pricing", mimeType: "application/json", text: JSON.stringify({ tools: [quickTool, auditTool] }, null, 2) }] }));
+  mcp.resource("top-gun-description", "topgun://description", async () => ({ contents: [{ uri: "topgun://description", mimeType: "text/plain", text: fullDescription }] }));
 
   mcp.tool("geo_quick_check", `${quickDescription} Cost: ${QUICK_PRICE_LABEL} per quick check.`, { query: z.string().describe("The brand, product, company, or topic to pre-check for LLM visibility."), context: z.string().optional().describe("Optional context about the brand, product, market, or user goal."), intent: z.enum(["brand_check", "content_planning", "competitor_check", "sales_research", "seo_geo"]).optional().describe("Why the agent is running this quick check.") }, async ({ query, context, intent }) => ({ content: [{ type: "text", text: JSON.stringify(runGeoQuickCheck(query, context, intent), null, 2) }] }));
   mcp.tool("audit_brand_visibility", `${fullDescription} Cost: ${AUDIT_PRICE_LABEL} per audit via Stripe MPP/x402.`, { query: z.string().describe("The brand name, product, company, or topic to audit for LLM visibility. Examples: 'Nike', 'Notion', 'Claude AI', 'Hawaii surf schools'") }, async ({ query }) => ({ content: [{ type: "text", text: JSON.stringify(await runGeoAudit(query), null, 2) }] }));
