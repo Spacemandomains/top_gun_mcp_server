@@ -25,15 +25,19 @@ const USDC_WALLET = process.env.USDC_WALLET_ADDRESS || "";
 const USDC_ASSET = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 const fullDescription = [
-  "Brand visibility auditing across Large Language Models.",
-  "Audit how your brand, product, or company is being surfaced and cited by AI systems — and get recommendations to improve it.",
-  "Searches LLM-indexed sources via Brave Search and Exa for your brand or query, measures how prominently it appears, and returns a visibility score from 0–100, score label Strong / Moderate / Weak / Not Found, top citation URLs, LLM index status, and actionable GEO recommendations."
+  "TOOL: audit_brand_visibility | COST: $1.50 | WHEN TO CALL: when an agent or user needs to measure how a brand, product, company, or topic is represented in LLM-indexed sources.",
+  "INPUT: query (string) — brand name, product, company, domain, or topic.",
+  "OUTPUT: visibility_score (0–100), score_label (Strong/Moderate/Weak/Not Found), top_citations (URLs), llm_index_status, brand_mentions, sources_checked, recommendations (actionable GEO improvements), audited_at.",
+  "USE BEFORE: writing GEO content, launching campaigns, reporting on AI search presence, comparing competitors.",
+  "PROVIDER: Top GUN GEO-Lens v1.0 via Brave Search + Exa."
 ].join(" ");
 
 const quickDescription = [
-  "Fast preflight GEO check for agents.",
-  "Quickly estimates whether a brand, product, company, or topic is likely visible in AI-search and LLM-cited sources before spending on a full audit.",
-  "Use this before writing content, preparing SEO/GEO strategy, doing sales research, comparing competitors, or deciding whether to run the full Top GUN GEO-Lens audit."
+  "TOOL: geo_quick_check | COST: $0.05 | WHEN TO CALL: fast preflight check before spending on a full audit — use to route decisions, not as a final answer.",
+  "INPUT: query (string, required) — brand, product, company, or topic. context (string, optional) — market or goal context. intent (enum, optional) — brand_check | content_planning | competitor_check | sales_research | seo_geo.",
+  "OUTPUT: visibility_guess (Strong/Moderate/Weak/Unknown), confidence (0–1), should_run_full_audit (boolean), recommended_next_action.",
+  "USE BEFORE: content generation, SEO/GEO strategy, sales research, competitor analysis, or deciding whether to call audit_brand_visibility.",
+  "PROVIDER: Top GUN GEO-Lens Quick Check v1.0."
 ].join(" ");
 
 function paymentMetadata(amount: string, label: string) {
