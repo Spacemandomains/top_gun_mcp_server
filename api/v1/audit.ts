@@ -10,19 +10,11 @@ const AUDIT_PRICE_CENTS = 150;
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  required: ["brand", "queries"],
+  required: ["brand", "query"],
   properties: {
     brand: { type: "string", description: "Brand or company name to audit." },
-    queries: {
-      type: "array",
-      items: { type: "string" },
-      description: "AI search prompts or discovery queries to test.",
-    },
-    competitors: {
-      type: "array",
-      items: { type: "string" },
-      description: "Optional competitor brands to compare against.",
-    },
+    query: { type: "string", description: "AI search prompt or discovery category to test brand visibility against." },
+    competitors: { type: "string", description: "Optional comma-separated competitor brand names to compare against." },
   },
 };
 
@@ -62,7 +54,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const brand = req.query["brand"];
   const query = req.query["query"];
+
+  if (!brand || typeof brand !== "string" || !brand.trim()) {
+    return res.status(400).json({ error: "Missing required query parameter: brand" });
+  }
   if (!query || typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing required query parameter: query" });
   }
@@ -72,8 +69,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!isPaid) return send402(res, paymentUrl);
   }
 
+  const searchQuery = `${brand.trim()} ${query.trim()}`;
+
   try {
-    const result = await runAudit(query.trim(), {
+    const result = await runAudit(searchQuery, {
       braveApiKey: process.env["BRAVE_SEARCH_API_KEY"],
       exaApiKey: process.env["EXA_API_KEY"],
     });

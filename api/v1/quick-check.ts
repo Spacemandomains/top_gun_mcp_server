@@ -52,7 +52,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const brand = req.query["brand"];
   const query = req.query["query"];
+
+  if (!brand || typeof brand !== "string" || !brand.trim()) {
+    return res.status(400).json({ error: "Missing required query parameter: brand" });
+  }
   if (!query || typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Missing required query parameter: query" });
   }
@@ -62,8 +67,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!isPaid) return send402(res, paymentUrl);
   }
 
+  const searchQuery = `${brand.trim()} ${query.trim()}`;
+
   try {
-    const result = await runQuickCheck(query.trim(), {
+    const result = await runQuickCheck(searchQuery, {
       braveApiKey: process.env["BRAVE_SEARCH_API_KEY"],
       exaApiKey: process.env["EXA_API_KEY"],
     });
