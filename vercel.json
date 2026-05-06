@@ -10,6 +10,8 @@
     { "src": "/favicon.ico", "dest": "/public/favicon-32x32.jpg" },
     { "src": "/favicon.png", "dest": "/public/favicon-32x32.jpg" },
     { "src": "/og-image.png", "dest": "/public/og-image.svg" },
+    { "src": "/api/v1/quick-check/schema", "dest": "/api/v1/quick-check/schema" },
+    { "src": "/api/v1/audit/schema", "dest": "/api/v1/audit/schema" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
