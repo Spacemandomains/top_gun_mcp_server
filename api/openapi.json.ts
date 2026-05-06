@@ -13,12 +13,19 @@ const spec = {
       "Unpaid requests return HTTP 402 with a valid x402 accepts array. " +
       "Quick Check: GET /api/v1/quick-check?query=<brand>. Full Audit: GET /api/v1/audit?query=<brand>.",
   },
+  tags: [
+    { name: "brand-visibility", description: "Brand visibility scoring and reporting" },
+    { name: "geo", description: "Generative Engine Optimization — visibility in LLM-generated answers" },
+    { name: "ai-search", description: "AI search and answer engine indexing analysis" },
+    { name: "llm", description: "Large Language Model recommendation and citation tracking" },
+    { name: "mcp", description: "Model Context Protocol server" },
+  ],
   paths: {
     "/api/v1/quick-check": {
       get: {
         operationId: "quickCheck",
         summary: "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.",
-        tags: ["Visibility"],
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
         "x-payment-info": {
           price: {
             mode: "fixed",
@@ -112,7 +119,7 @@ const spec = {
       get: {
         operationId: "fullAudit",
         summary: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength.",
-        tags: ["Visibility"],
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
         "x-payment-info": {
           price: {
             mode: "fixed",
