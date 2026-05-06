@@ -10,16 +10,18 @@ const AMOUNT_BASE_UNITS = "500000"; // $0.50 USDC — 6 decimals
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  required: ["query"],
+  required: ["brand", "query"],
   properties: {
-    query: { type: "string", description: "Brand name, company, URL, or topic to check" },
+    brand: { type: "string", description: "Brand or company name to check." },
+    query: { type: "string", description: "Search or prompt category to test visibility against." },
   },
 };
 
 const OUTPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
+  required: ["score", "label", "topCitations", "quickTips"],
   properties: {
-    score: { type: "number" },
+    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
     label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
     topCitations: { type: "array", items: { type: "object" } },
     quickTips: { type: "array", items: { type: "string" } },
@@ -27,7 +29,7 @@ const OUTPUT_SCHEMA: Record<string, unknown> = {
 };
 
 function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
-  const body = buildX402Body(RESOURCE, "TOP GUN GEO-Lens quick visibility check.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA);
+  const body = buildX402Body(RESOURCE, "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA);
   const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
   res.setHeader("Content-Type", "application/json");
   res.setHeader("WWW-Authenticate", `x402 realm="${RESOURCE}", ${tempoHeader}`);
@@ -35,18 +37,19 @@ function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   const stripeSecretKey = process.env["STRIPE_SECRET_KEY"] ?? "";
   const paymentUrl = process.env["STRIPE_QUICK_CHECK_PAYMENT_URL"] ?? "";
 
   const x402Payment = req.headers["x-payment"];
   const stripeToken = req.headers["x-payment-token"];
 
+  // Payment check before method check — all unpaid requests return 402
   if (!x402Payment && (!stripeToken || typeof stripeToken !== "string")) {
     return send402(res, paymentUrl);
+  }
+
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const query = req.query["query"];
