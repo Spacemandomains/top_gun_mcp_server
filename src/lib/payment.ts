@@ -56,6 +56,8 @@ export interface X402PaymentRequired {
   x402Version: 1;
   error: "Payment Required";
   accepts: X402Accept[];
+  input_schema?: Record<string, unknown>;
+  output_schema?: Record<string, unknown>;
 }
 
 export function buildX402Body(
@@ -83,6 +85,8 @@ export function buildX402Body(
     x402Version: 1,
     error: "Payment Required",
     accepts: [accept],
+    input_schema: inputSchema,
+    output_schema: outputSchema,
   };
 }
 
