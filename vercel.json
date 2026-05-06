@@ -9,6 +9,7 @@
     { "src": "/openapi.json", "dest": "/api/openapi.json" },
     { "src": "/favicon.ico", "dest": "/public/favicon-32x32.jpg" },
     { "src": "/favicon.png", "dest": "/public/favicon-32x32.jpg" },
+    { "src": "/og-image.png", "dest": "/public/og-image.svg" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
