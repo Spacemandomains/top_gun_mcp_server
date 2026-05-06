@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { runAudit } from "../../src/lib/audit.js";
 import { verifyStripeSession, buildPaymentRequired } from "../../src/lib/payment.js";
 
+const AUDIT_PRICE_CENTS = 150; // $1.50 USDC
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -16,16 +18,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const paymentUrl = process.env["STRIPE_PAYMENT_URL"] ?? "";
   const walletAddress = process.env["USDC_WALLET_ADDRESS"];
 
-  // x402 payment gate
   const paymentToken = req.headers["x-payment-token"];
   if (!paymentToken || typeof paymentToken !== "string") {
     res.setHeader("X-Payment-Required", "true");
-    return res.status(402).json(buildPaymentRequired(paymentUrl, walletAddress));
+    res.setHeader("WWW-Authenticate", `MPP realm="top-gun-geo-lens", price="1.50", currency="USDC"`);
+    return res.status(402).json(buildPaymentRequired(paymentUrl, "1.50", walletAddress));
   }
 
-  const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey);
+  const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey, AUDIT_PRICE_CENTS);
   if (!isPaid) {
     res.setHeader("X-Payment-Required", "true");
+    res.setHeader("WWW-Authenticate", `MPP realm="top-gun-geo-lens", price="1.50", currency="USDC"`);
     return res
       .status(402)
       .json({ error: "invalid_payment", message: "Payment token invalid or unpaid." });

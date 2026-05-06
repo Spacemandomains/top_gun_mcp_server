@@ -6,6 +6,7 @@
     }
   },
   "routes": [
+    { "src": "/openapi.json", "dest": "/api/openapi.json" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]

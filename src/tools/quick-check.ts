@@ -4,14 +4,14 @@ import { verifyStripeSession, buildPaymentRequired } from "../lib/payment.js";
 import { formatPaymentRequired } from "./audit.js";
 import type { QuickCheckResult } from "../lib/types.js";
 
-export const QUICK_CHECK_PRICE_CENTS = 5; // $0.05
+export const QUICK_CHECK_PRICE_CENTS = 50; // $0.50
 
 export const QuickCheckInputSchema = z.object({
   query: z.string().min(1).describe("Brand name, company, or product to check"),
   paymentToken: z
     .string()
     .optional()
-    .describe("Stripe session ID from a completed $0.05 USDC payment"),
+    .describe("Stripe session ID from a completed $0.50 USDC payment"),
 });
 
 export type QuickCheckInput = z.infer<typeof QuickCheckInputSchema>;
@@ -22,7 +22,7 @@ export async function handleQuickCheckTool(input: QuickCheckInput): Promise<stri
   const walletAddress = process.env["USDC_WALLET_ADDRESS"];
 
   if (!input.paymentToken) {
-    return formatPaymentRequired(buildPaymentRequired(paymentUrl, "0.05", walletAddress));
+    return formatPaymentRequired(buildPaymentRequired(paymentUrl, "0.50", walletAddress));
   }
 
   const isPaid = await verifyStripeSession(
@@ -34,7 +34,7 @@ export async function handleQuickCheckTool(input: QuickCheckInput): Promise<stri
     return [
       "Payment token is invalid or unpaid.",
       "",
-      `Complete the $0.05 payment at: ${paymentUrl}`,
+      `Complete the $0.50 payment at: ${paymentUrl}`,
       "Then retry with the Stripe session ID as `paymentToken`.",
     ].join("\n");
   }

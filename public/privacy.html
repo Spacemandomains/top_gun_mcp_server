@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — TOP GUN GEO-Lens</title>
+  <link rel="icon" type="image/jpeg" href="/favicon-32x32.jpg" sizes="32x32" />
+  <link rel="shortcut icon" href="/favicon-32x32.jpg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #080c10;
+      --dark: #0d1117;
+      --panel: #111820;
+      --border: #1e2d3d;
+      --accent: #f5a623;
+      --text: #c9d1d9;
+      --muted: #6e7681;
+      --strong: #e6edf3;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 12, 16, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .nav-logo span { color: var(--strong); }
+
+    .nav-logo img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    .eyebrow {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'Courier New', monospace;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      color: var(--strong);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .last-updated {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 2.5rem 0 0.75rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    ul li {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .highlight {
+      background: var(--panel);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="/">
+      <img src="/favicon-32x32.jpg" alt="" onerror="this.style.display='none'" />
+      <span>TOP GUN</span> // GEO-LENS
+    </a>
+  </nav>
+
+  <div class="container">
+    <p class="eyebrow">// LEGAL</p>
+    <h1>Privacy Policy</h1>
+    <p class="last-updated">Last updated: May 2026</p>
+
+    <div class="highlight">
+      TOP GUN GEO-Lens is a pay-per-query API service. We collect only what is necessary to process your request and complete payment. We do not sell your data.
+    </div>
+
+    <h2>1. What We Collect</h2>
+    <p>When you use GEO-Lens we collect:</p>
+    <ul>
+      <li><strong>Query strings</strong> — the brand name or keyword you submit for auditing.</li>
+      <li><strong>Payment tokens</strong> — the Stripe session ID you provide to authorise a query. We do not store full card details; those are held by Stripe under their own privacy policy.</li>
+      <li><strong>Server logs</strong> — standard HTTP request metadata (IP address, timestamp, HTTP method, response status) retained for up to 30 days for security and debugging.</li>
+    </ul>
+
+    <h2>2. What We Do Not Collect</h2>
+    <ul>
+      <li>We do not require account registration or store user profiles.</li>
+      <li>We do not use tracking pixels, advertising cookies, or third-party analytics.</li>
+      <li>We do not retain audit results after the API response is returned.</li>
+    </ul>
+
+    <h2>3. How We Use Your Data</h2>
+    <p>Data collected is used solely to:</p>
+    <ul>
+      <li>Execute the search and scoring pipeline for your submitted query.</li>
+      <li>Verify payment via Stripe before processing a request.</li>
+      <li>Maintain service security and diagnose errors.</li>
+    </ul>
+
+    <h2>4. Third-Party Services</h2>
+    <p>GEO-Lens relies on the following third-party services to operate:</p>
+    <ul>
+      <li><strong>Stripe</strong> — payment processing. Your payment data is governed by <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a>.</li>
+      <li><strong>Brave Search API</strong> — search index queries. Queries are sent to Brave's API under their terms of service.</li>
+      <li><strong>Exa API</strong> — semantic search index queries. Queries are sent to Exa's API under their terms of service.</li>
+      <li><strong>Vercel</strong> — hosting and edge infrastructure. Traffic is processed under <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel's Privacy Policy</a>.</li>
+    </ul>
+    <p>We do not share your query data with these providers beyond what is required to fulfil your request.</p>
+
+    <h2>5. Data Retention</h2>
+    <p>Query strings and payment tokens are not persisted to a database. Server access logs are retained for up to 30 days, then deleted. No audit results are stored after the API response is delivered.</p>
+
+    <h2>6. Security</h2>
+    <p>All traffic is served over HTTPS. Payment verification is performed server-side using your Stripe secret key, which is never exposed to the client. We follow responsible security practices and review access controls regularly.</p>
+
+    <h2>7. Your Rights</h2>
+    <p>Because we do not maintain user accounts or persistent query records, there is no personal profile to access, correct, or delete. If you have questions about data processed during a specific transaction, contact us at the address below and we will respond within 30 days.</p>
+
+    <h2>8. Children's Privacy</h2>
+    <p>GEO-Lens is a developer API service not directed at children under 13. We do not knowingly collect data from minors.</p>
+
+    <h2>9. Changes to This Policy</h2>
+    <p>We may update this policy as the service evolves. Material changes will be reflected in the "Last updated" date above. Continued use of the service after changes constitutes acceptance of the revised policy.</p>
+
+    <h2>10. Contact</h2>
+    <p>Questions about this policy can be directed to the project repository:</p>
+    <p><a href="https://github.com/Spacemandomains/top_gun_mcp_server" target="_blank" rel="noopener">github.com/Spacemandomains/top_gun_mcp_server</a></p>
+  </div>
+
+  <footer>
+    <p><a href="/">← Back to GEO-Lens</a> &nbsp;·&nbsp; TOP GUN GEO-Lens &nbsp;·&nbsp; <a href="/privacy.html">Privacy Policy</a></p>
+  </footer>
+
+</body>
+</html>
