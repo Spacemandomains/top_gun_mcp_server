@@ -26,12 +26,11 @@ const spec = {
             amount: "0.500000",
           },
           protocols: [
-            { x402: {} },
             {
-              mpp: {
-                method: "",
-                intent: "",
-                currency: "",
+              tempo: {
+                method: "tempo",
+                intent: "charge",
+                realm: "top-gun-mcp-server.vercel.app",
               },
             },
           ],
@@ -101,12 +100,11 @@ const spec = {
             amount: "1.500000",
           },
           protocols: [
-            { x402: {} },
             {
-              mpp: {
-                method: "",
-                intent: "",
-                currency: "",
+              tempo: {
+                method: "tempo",
+                intent: "charge",
+                realm: "top-gun-mcp-server.vercel.app",
               },
             },
           ],
