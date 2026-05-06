@@ -10,16 +10,27 @@ const AUDIT_PRICE_CENTS = 150;
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  required: ["query"],
+  required: ["brand", "queries"],
   properties: {
-    query: { type: "string", description: "Brand name, company, URL, or topic to audit" },
+    brand: { type: "string", description: "Brand or company name to audit." },
+    queries: {
+      type: "array",
+      items: { type: "string" },
+      description: "AI search prompts or discovery queries to test.",
+    },
+    competitors: {
+      type: "array",
+      items: { type: "string" },
+      description: "Optional competitor brands to compare against.",
+    },
   },
 };
 
 const OUTPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
+  required: ["score", "label", "citations", "llmIndexStatus", "recommendations"],
   properties: {
-    score: { type: "number" },
+    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
     label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
     citations: { type: "array", items: { type: "object" } },
     llmIndexStatus: { type: "object" },
@@ -28,7 +39,7 @@ const OUTPUT_SCHEMA: Record<string, unknown> = {
 };
 
 function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
-  const body = buildX402Body(RESOURCE, "TOP GUN GEO-Lens full brand visibility audit with citations, LLM index status, and recommendations.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA);
+  const body = buildX402Body(RESOURCE, "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA);
   const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
   res.setHeader("Content-Type", "application/json");
   res.setHeader("WWW-Authenticate", `x402 realm="${RESOURCE}", ${tempoHeader}`);
@@ -36,18 +47,19 @@ function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   const stripeSecretKey = process.env["STRIPE_SECRET_KEY"] ?? "";
   const paymentUrl = process.env["STRIPE_PAYMENT_URL"] ?? "";
 
   const x402Payment = req.headers["x-payment"];
   const stripeToken = req.headers["x-payment-token"];
 
+  // Payment check before method check — all unpaid requests return 402
   if (!x402Payment && (!stripeToken || typeof stripeToken !== "string")) {
     return send402(res, paymentUrl);
+  }
+
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const query = req.query["query"];

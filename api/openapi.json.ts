@@ -3,22 +3,29 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 const spec = {
   openapi: "3.1.0",
   info: {
-    title: "TOP GUN GEO-Lens",
+    title: "TOP GUN — GEO-Lens | Brand Visibility Auditing for LLMs",
     version: "1.0.0",
     description:
-      "Top Gun GEO Lens helps AI agents, founders, marketers, and SEO teams audit how visible a brand is inside AI search, AI agents, and answer-engine recommendations. " +
-      "Use quick-check to scan a URL, company, product, or topic and return a concise visibility report with ranking signals, content gaps, and recommendations for improving agent discoverability.",
+      "TOP GUN GEO-Lens audits how brands appear across LLMs, AI search, answer engines, and recommendation systems. " +
+      "Use Quick Check for a fast visibility snapshot, or Full Audit for a deep multi-query brand intelligence report.",
     "x-guidance":
-      "Use GET /api/v1/quick-check?query=<brand|url|topic> to run a fast GEO visibility audit. " +
-      "Returns a visibility score, ranking signals, content gaps, and recommendations. " +
-      "Requires an X-PAYMENT (x402) or X-Payment-Token (Stripe) header.",
+      "All endpoints require payment via x402 (X-PAYMENT header) or Stripe (X-Payment-Token header). " +
+      "Unpaid requests return HTTP 402 with a valid x402 accepts array. " +
+      "Quick Check: GET /api/v1/quick-check?query=<brand>. Full Audit: GET /api/v1/audit?query=<brand>.",
   },
+  tags: [
+    { name: "brand-visibility", description: "Brand visibility scoring and reporting" },
+    { name: "geo", description: "Generative Engine Optimization — visibility in LLM-generated answers" },
+    { name: "ai-search", description: "AI search and answer engine indexing analysis" },
+    { name: "llm", description: "Large Language Model recommendation and citation tracking" },
+    { name: "mcp", description: "Model Context Protocol server" },
+  ],
   paths: {
     "/api/v1/quick-check": {
       get: {
         operationId: "quickCheck",
-        summary: "Run a fast GEO visibility audit to test whether a brand, website, product, or topic is visible to AI agents and answer engines.",
-        tags: ["Visibility"],
+        summary: "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
         "x-payment-info": {
           price: {
             mode: "fixed",
@@ -32,6 +39,7 @@ const spec = {
                 network: "base",
                 asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                 maxAmountRequired: "500000",
+                resource: "https://top-gun-mcp-server.vercel.app/api/v1/quick-check",
               },
             },
             {
@@ -45,10 +53,17 @@ const spec = {
         },
         parameters: [
           {
+            name: "brand",
+            in: "query",
+            required: true,
+            description: "Brand or company name to check",
+            schema: { type: "string", minLength: 1 },
+          },
+          {
             name: "query",
             in: "query",
             required: true,
-            description: "Brand name, company, or product to check",
+            description: "Search or prompt category to test visibility against",
             schema: { type: "string", minLength: 1 },
           },
           {
@@ -60,7 +75,7 @@ const spec = {
           {
             name: "X-Payment-Token",
             in: "header",
-            description: "Stripe checkout session ID from a completed $0.50 USDC payment",
+            description: "Stripe checkout session ID from a completed $0.50 payment",
             schema: { type: "string" },
           },
         ],
@@ -71,10 +86,9 @@ const spec = {
               "application/json": {
                 schema: {
                   type: "object",
-                  required: ["query", "score", "label", "topCitations", "quickTips", "checkedAt"],
+                  required: ["score", "label", "topCitations", "quickTips"],
                   properties: {
-                    query: { type: "string" },
-                    score: { type: "number", minimum: 0, maximum: 100 },
+                    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
                     label: {
                       type: "string",
                       enum: ["Strong", "Moderate", "Weak", "Not Found"],
@@ -104,8 +118,8 @@ const spec = {
     "/api/v1/audit": {
       get: {
         operationId: "fullAudit",
-        summary: "Full Audit — deep brand visibility analysis with citations, LLM index status, and recommendations.",
-        tags: ["Visibility"],
+        summary: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
         "x-payment-info": {
           price: {
             mode: "fixed",
@@ -119,6 +133,7 @@ const spec = {
                 network: "base",
                 asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
                 maxAmountRequired: "1500000",
+                resource: "https://top-gun-mcp-server.vercel.app/api/v1/audit",
               },
             },
             {
@@ -132,11 +147,23 @@ const spec = {
         },
         parameters: [
           {
-            name: "query",
+            name: "brand",
             in: "query",
             required: true,
-            description: "Brand name, company, or product to audit",
+            description: "Brand or company name to audit",
             schema: { type: "string", minLength: 1 },
+          },
+          {
+            name: "queries",
+            in: "query",
+            description: "AI search prompts or discovery queries to test (comma-separated)",
+            schema: { type: "string" },
+          },
+          {
+            name: "competitors",
+            in: "query",
+            description: "Optional competitor brands to compare against (comma-separated)",
+            schema: { type: "string" },
           },
           {
             name: "X-PAYMENT",
@@ -147,7 +174,7 @@ const spec = {
           {
             name: "X-Payment-Token",
             in: "header",
-            description: "Stripe checkout session ID from a completed $1.50 USDC payment",
+            description: "Stripe checkout session ID from a completed $1.50 payment",
             schema: { type: "string" },
           },
         ],
@@ -158,10 +185,9 @@ const spec = {
               "application/json": {
                 schema: {
                   type: "object",
-                  required: ["query", "score", "label", "citations", "llmIndexStatus", "recommendations", "searchedAt"],
+                  required: ["score", "label", "citations", "llmIndexStatus", "recommendations"],
                   properties: {
-                    query: { type: "string" },
-                    score: { type: "number", minimum: 0, maximum: 100 },
+                    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
                     label: {
                       type: "string",
                       enum: ["Strong", "Moderate", "Weak", "Not Found"],
@@ -217,12 +243,30 @@ const spec = {
       },
       PaymentRequired: {
         type: "object",
+        required: ["x402Version", "error", "accepts"],
         properties: {
-          x402Version: { type: "number" },
-          error: { type: "string" },
-          accepts: { type: "array", items: { type: "object" } },
-          payment_options: { type: "array", items: { type: "object" } },
-          challenges: { type: "array", items: { type: "object" } },
+          x402Version: { type: "integer", enum: [1] },
+          error: { type: "string", enum: ["Payment Required"] },
+          accepts: {
+            type: "array",
+            items: {
+              type: "object",
+              required: ["scheme", "network", "maxAmountRequired", "resource", "description", "mimeType", "payTo", "maxTimeoutSeconds", "asset", "inputSchema", "outputSchema"],
+              properties: {
+                scheme: { type: "string" },
+                network: { type: "string" },
+                maxAmountRequired: { type: "string" },
+                resource: { type: "string", format: "uri" },
+                description: { type: "string" },
+                mimeType: { type: "string" },
+                payTo: { type: "string" },
+                maxTimeoutSeconds: { type: "integer" },
+                asset: { type: "string" },
+                inputSchema: { type: "object" },
+                outputSchema: { type: "object" },
+              },
+            },
+          },
         },
       },
     },
