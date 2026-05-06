@@ -22,7 +22,7 @@ export async function handleQuickCheckTool(input: QuickCheckInput): Promise<stri
   const walletAddress = process.env["USDC_WALLET_ADDRESS"];
 
   if (!input.paymentToken) {
-    return formatPaymentRequired(buildPaymentRequired(paymentUrl, "0.50", walletAddress));
+    return formatPaymentRequired(buildPaymentRequired(paymentUrl, "1.50", walletAddress));
   }
 
   const isPaid = await verifyStripeSession(
