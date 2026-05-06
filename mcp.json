@@ -1,7 +1,7 @@
 {
   "name": "top-gun-geo-lens",
   "version": "1.0.0",
-  "description": "TOP GUN GEO-Lens: Brand visibility auditing across LLMs. Quick check $0.05 · Full audit $1.50 USDC.",
+  "description": "TOP GUN GEO-Lens: Brand visibility auditing across LLMs, AI search, and answer engines. Quick Check $0.50 · Full Audit $1.50 USDC.",
   "icon": "/favicon-32x32.jpg",
   "transport": "stdio",
   "command": "node",
@@ -9,7 +9,7 @@
   "env": {
     "STRIPE_SECRET_KEY": { "required": true, "description": "Stripe secret key for payment verification" },
     "STRIPE_PAYMENT_URL": { "required": true, "description": "Stripe payment link for full audit ($1.50 USDC)" },
-    "STRIPE_QUICK_CHECK_PAYMENT_URL": { "required": true, "description": "Stripe payment link for quick check ($0.05 USDC)" },
+    "STRIPE_QUICK_CHECK_PAYMENT_URL": { "required": true, "description": "Stripe payment link for quick check ($0.50 USDC)" },
     "BRAVE_SEARCH_API_KEY": { "required": false, "description": "Brave Search API key" },
     "EXA_API_KEY": { "required": false, "description": "Exa neural search API key" },
     "USDC_WALLET_ADDRESS": { "required": false, "description": "USDC wallet address shown to payers" }
@@ -17,15 +17,59 @@
   "tools": [
     {
       "name": "geo_quick_check",
-      "description": "Quick brand visibility snapshot — score, top 3 citations, 2 quick tips. $0.05 USDC."
+      "description": "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations. Returns a visibility score, top citations, and quick tips. $0.50 USDC.",
+      "input_schema": {
+        "type": "object",
+        "required": ["brand", "query"],
+        "properties": {
+          "brand": {
+            "type": "string",
+            "description": "Brand or company name to check."
+          },
+          "query": {
+            "type": "string",
+            "description": "Search or prompt category to test visibility against."
+          },
+          "paymentToken": {
+            "type": "string",
+            "description": "Stripe checkout session ID from a completed $0.50 payment."
+          }
+        }
+      }
     },
     {
       "name": "audit_brand",
-      "description": "Full brand visibility audit — score, 5 citations, LLM index status, 6 GEO recs. $1.50 USDC."
+      "description": "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength. Returns score, citations, LLM index status, and recommendations. $1.50 USDC.",
+      "input_schema": {
+        "type": "object",
+        "required": ["brand", "query"],
+        "properties": {
+          "brand": {
+            "type": "string",
+            "description": "Brand or company name to audit."
+          },
+          "query": {
+            "type": "string",
+            "description": "AI search prompt or discovery category to test brand visibility against."
+          },
+          "competitors": {
+            "type": "string",
+            "description": "Optional comma-separated competitor brand names to compare against."
+          },
+          "paymentToken": {
+            "type": "string",
+            "description": "Stripe checkout session ID from a completed $1.50 payment."
+          }
+        }
+      }
     },
     {
       "name": "get_payment_info",
-      "description": "Get payment URLs and USDC wallet address for both audit tiers."
+      "description": "Get payment URLs and USDC wallet address for both audit tiers.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
     }
   ]
 }
