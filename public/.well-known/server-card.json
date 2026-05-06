@@ -1,8 +1,10 @@
 {
-  "name": "Top GUN — GEO-Lens Audit API",
-  "description": "Audits brand visibility across Large Language Models. Discover how your brand, product, or company is being surfaced and cited by AI systems. Returns a visibility score, top citation URLs, LLM index status, and actionable GEO recommendations.",
+  "name": "Top GUN GEO-Lens API",
+  "description": "Professional auditing for Generative Engine Optimization (GEO). Measures brand visibility and citations in LLM search results.",
   "version": "1.0.0",
   "url": "https://top-gun-mcp-server.vercel.app",
+  "icon": "https://top-gun-mcp-server.vercel.app/top-gun-favicon.png",
+  "logo": "https://top-gun-mcp-server.vercel.app/top-gun-favicon.png",
   "mcp_endpoint": "https://top-gun-mcp-server.vercel.app/api/mcp",
   "transport": ["streamable-http"],
   "spec_version": "2025-03-26",
@@ -12,6 +14,64 @@
     "payments": { "protocols": ["mpp-tempo-1", "stripe-mpp", "x402"] }
   },
   "resources": [
+    {
+      "id": "tool_audit",
+      "type": "tool",
+      "name": "Top GUN GEO-Lens Audit",
+      "title": "Top GUN GEO-Lens Audit",
+      "uri": "topgun://tools/tool_audit",
+      "description": "Professional auditing for Generative Engine Optimization. Measures brand visibility and citations in LLM search results.",
+      "method": "GET",
+      "path": "/api/v1/audit",
+      "url": "https://top-gun-mcp-server.vercel.app/api/v1/audit",
+      "price": "1.50",
+      "currency": "USD",
+      "pricing": {
+        "type": "fixed",
+        "amount": "1.50",
+        "currency": "USD",
+        "display": "$1.50",
+        "protocols": ["mpp-tempo-1", "stripe-mpp", "x402"]
+      },
+      "inputSchema": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The public MCP server, OpenAPI spec, endpoint, brand website, or URL to audit."
+          }
+        }
+      },
+      "mimeType": "application/json"
+    },
+    {
+      "id": "geo_quick_check",
+      "type": "tool",
+      "name": "GEO Quick Check",
+      "title": "GEO Quick Check",
+      "uri": "topgun://tools/geo_quick_check",
+      "description": "Fast preflight GEO check for agents before running a full audit.",
+      "method": "POST",
+      "path": "/api/mcp",
+      "price": "0.05",
+      "currency": "USD",
+      "mimeType": "application/json"
+    },
+    {
+      "id": "audit_brand_visibility",
+      "type": "tool",
+      "name": "Audit Brand Visibility",
+      "title": "Audit Brand Visibility",
+      "uri": "topgun://tools/audit_brand_visibility",
+      "description": "Audit how a brand or topic is represented and cited across LLM-indexed sources. Returns visibility score, citations, index status, and improvement recommendations.",
+      "method": "POST",
+      "path": "/api/mcp",
+      "price": "1.50",
+      "currency": "USD",
+      "mimeType": "application/json"
+    },
     {
       "name": "Top GUN Tools and Pricing",
       "uri": "topgun://tools",
@@ -33,17 +93,37 @@
   ],
   "tools": [
     {
+      "name": "tool_audit",
+      "title": "Top GUN GEO-Lens Audit",
+      "price": "$1.50",
+      "description": "Professional auditing for Generative Engine Optimization. Measures brand visibility and citations in LLM search results.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The public MCP server, OpenAPI spec, endpoint, brand website, or URL to audit."
+          }
+        }
+      }
+    },
+    {
       "name": "geo_quick_check",
+      "title": "GEO Quick Check",
       "price": "$0.05",
       "description": "Fast preflight GEO check. Quickly estimates whether a brand, product, or topic is likely visible in AI-search and LLM-cited sources before spending on a full audit."
     },
     {
       "name": "audit_brand_visibility",
+      "title": "Audit Brand Visibility",
       "price": "$1.50",
       "description": "Audit how a brand or topic is represented and cited across LLM-indexed sources. Returns visibility score, citations, index status, and improvement recommendations."
     }
   ],
   "use_cases": [
+    "Agents auditing MCP servers and OpenAPI endpoints for discoverability and MPP Scan readiness",
     "Brand managers checking LLM visibility before campaigns",
     "SEO and GEO professionals auditing client presence in AI search",
     "Marketers comparing brand visibility to competitors",
@@ -53,6 +133,7 @@
   "discovery": {
     "server_card": "https://top-gun-mcp-server.vercel.app/.well-known/server-card.json",
     "llms_txt": "https://top-gun-mcp-server.vercel.app/llms.txt",
-    "agent_card": "https://top-gun-mcp-server.vercel.app/.well-known/agent-card.json"
+    "agent_card": "https://top-gun-mcp-server.vercel.app/.well-known/agent-card.json",
+    "openapi": "https://top-gun-mcp-server.vercel.app/openapi.json"
   }
 }
