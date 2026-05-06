@@ -99,9 +99,7 @@ const pricedResources = [
 const infoResources = [
   { name: "Top GUN Tools and Pricing", uri: "topgun://tools", description: "Lists the paid MCP tools available from Top GUN GEO-Lens, including prices and when agents should call each tool.", mimeType: "application/json" },
   { name: "Top GUN Pricing", uri: "topgun://pricing", description: "Machine-readable pricing for Top GUN GEO-Lens MCP tools.", mimeType: "application/json" },
-  { name: "Top GUN Description", uri: "topgun://description", description: "Marketplace description and use cases for Top GUN GEO-Lens.", mimeType: "text/plain" },
-  { name: "GEO Quick Check", uri: `${SERVER_URL}/api/mcp`, description: "Fast preflight GEO check for agents. Cost: $0.05", method: "POST", path: "/api/mcp", url: `${SERVER_URL}/api/mcp`, price: "$0.05", pricing: { type: "fixed", amount: "0.05", currency: "USD", display: "$0.05", protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] }, "x-payment-info": { pricingMode: "fixed", price: "0.05", currency: "USD", protocols: ["mpp-tempo-1"] } },
-  { name: "Audit Brand Visibility", uri: `${SERVER_URL}/api/mcp`, description: "Full LLM brand visibility audit. Cost: $1.50", method: "POST", path: "/api/mcp", url: `${SERVER_URL}/api/mcp`, price: "$1.50", pricing: { type: "fixed", amount: "1.50", currency: "USD", display: "$1.50", protocols: ["mpp-tempo-1", "stripe-mpp", "x402"] }, "x-payment-info": { pricingMode: "fixed", price: "1.50", currency: "USD", protocols: ["mpp-tempo-1"] } }
+  { name: "Top GUN Description", uri: "topgun://description", description: "Marketplace description and use cases for Top GUN GEO-Lens.", mimeType: "text/plain" }
 ];
 
 const resources = [...pricedResources, ...infoResources];
@@ -166,7 +164,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const toolName: string | undefined = req.body?.method === "tools/call" ? req.body?.params?.name : undefined;
   if (toolName === "audit_brand_visibility" || toolName === "geo_quick_check" || toolName === "tool_audit") { const ok = await requirePayment(req, res, toolName); if (!ok) return; }
 
-  // ✅ Fixed: changed `type` to `mimeType` in the icons array
   const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0", description: fullDescription, icons: [{ src: `${SERVER_URL}/top-gun-favicon.png`, mimeType: "image/png", sizes: ["512x512"] }] });
 
   mcp.resource("top-gun-tools", "topgun://tools", async () => ({ contents: [{ uri: "topgun://tools", mimeType: "application/json", text: JSON.stringify(toolsAndPricing, null, 2) }] }));
