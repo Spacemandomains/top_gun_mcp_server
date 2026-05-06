@@ -23,7 +23,7 @@ const spec = {
           price: {
             mode: "fixed",
             currency: "USD",
-            amount: "1.500000",
+            amount: "0.500000",
           },
           protocols: [
             { x402: {} },
@@ -48,7 +48,7 @@ const spec = {
             name: "X-Payment-Token",
             in: "header",
             required: true,
-            description: "Stripe checkout session ID from a completed $1.50 USDC payment",
+            description: "Stripe checkout session ID from a completed $0.50 USDC payment",
             schema: { type: "string" },
           },
         ],

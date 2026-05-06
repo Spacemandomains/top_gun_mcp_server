@@ -15,8 +15,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const paymentToken = req.headers["x-payment-token"];
   if (!paymentToken || typeof paymentToken !== "string") {
     res.setHeader("X-Payment-Required", "true");
-    res.setHeader("WWW-Authenticate", `MPP realm="top-gun-mcp-server.vercel.app", price="1.50", currency="USDC"`);
-    return res.status(402).json(buildPaymentRequired(paymentUrl, "1.50", walletAddress));
+    res.setHeader("WWW-Authenticate", `MPP realm="top-gun-mcp-server.vercel.app", price="0.50", currency="USDC"`);
+    return res.status(402).json(buildPaymentRequired(paymentUrl, "0.50", walletAddress));
   }
 
   const query = req.query["query"];
@@ -27,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey, QUICK_CHECK_PRICE_CENTS);
   if (!isPaid) {
     res.setHeader("X-Payment-Required", "true");
-    res.setHeader("WWW-Authenticate", `MPP realm="top-gun-mcp-server.vercel.app", price="1.50", currency="USDC"`);
+    res.setHeader("WWW-Authenticate", `MPP realm="top-gun-mcp-server.vercel.app", price="0.50", currency="USDC"`);
     return res
       .status(402)
       .json({ error: "invalid_payment", message: "Payment token invalid or unpaid." });
