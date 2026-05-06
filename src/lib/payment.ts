@@ -48,8 +48,8 @@ export interface X402Accept {
   payTo: string;
   maxTimeoutSeconds: number;
   asset: string;
-  inputSchema: Record<string, unknown>;
-  outputSchema: Record<string, unknown>;
+  input_schema: Record<string, unknown>;
+  output_schema: Record<string, unknown>;
 }
 
 export interface X402PaymentRequired {
@@ -76,8 +76,8 @@ export function buildX402Body(
     payTo,
     maxTimeoutSeconds: 300,
     asset: USDC_BASE_ASSET,
-    inputSchema,
-    outputSchema,
+    input_schema: inputSchema,
+    output_schema: outputSchema,
   };
   return {
     x402Version: 1,

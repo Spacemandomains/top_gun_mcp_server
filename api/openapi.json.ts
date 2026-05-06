@@ -252,7 +252,7 @@ const spec = {
             type: "array",
             items: {
               type: "object",
-              required: ["scheme", "network", "maxAmountRequired", "resource", "description", "mimeType", "payTo", "maxTimeoutSeconds", "asset", "inputSchema", "outputSchema"],
+              required: ["scheme", "network", "maxAmountRequired", "resource", "description", "mimeType", "payTo", "maxTimeoutSeconds", "asset", "input_schema", "output_schema"],
               properties: {
                 scheme: { type: "string" },
                 network: { type: "string" },
@@ -263,8 +263,8 @@ const spec = {
                 payTo: { type: "string" },
                 maxTimeoutSeconds: { type: "integer" },
                 asset: { type: "string" },
-                inputSchema: { type: "object" },
-                outputSchema: { type: "object" },
+                input_schema: { type: "object" },
+                output_schema: { type: "object" },
               },
             },
           },
