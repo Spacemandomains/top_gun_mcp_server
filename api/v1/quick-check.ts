@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { runAudit } from "../../src/lib/audit.js";
+import { runQuickCheck } from "../../src/lib/audit.js";
 import { verifyStripeSession, buildPaymentRequired } from "../../src/lib/payment.js";
+import { QUICK_CHECK_PRICE_CENTS } from "../../src/tools/quick-check.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
@@ -13,17 +14,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const stripeSecretKey = process.env["STRIPE_SECRET_KEY"] ?? "";
-  const paymentUrl = process.env["STRIPE_PAYMENT_URL"] ?? "";
+  const paymentUrl = process.env["STRIPE_QUICK_CHECK_PAYMENT_URL"] ?? "";
   const walletAddress = process.env["USDC_WALLET_ADDRESS"];
 
-  // x402 payment gate
   const paymentToken = req.headers["x-payment-token"];
   if (!paymentToken || typeof paymentToken !== "string") {
     res.setHeader("X-Payment-Required", "true");
-    return res.status(402).json(buildPaymentRequired(paymentUrl, walletAddress));
+    return res.status(402).json(buildPaymentRequired(paymentUrl, "0.05", walletAddress));
   }
 
-  const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey);
+  const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey, QUICK_CHECK_PRICE_CENTS);
   if (!isPaid) {
     res.setHeader("X-Payment-Required", "true");
     return res
@@ -32,14 +32,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const result = await runAudit(query.trim(), {
+    const result = await runQuickCheck(query.trim(), {
       braveApiKey: process.env["BRAVE_SEARCH_API_KEY"],
       exaApiKey: process.env["EXA_API_KEY"],
     });
 
     return res.status(200).json(result);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Audit failed";
-    return res.status(500).json({ error: "audit_failed", message });
+    const message = err instanceof Error ? err.message : "Quick check failed";
+    return res.status(500).json({ error: "quick_check_failed", message });
   }
 }
