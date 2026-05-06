@@ -5,23 +5,25 @@ const spec = {
   info: {
     title: "TOP GUN GEO-Lens",
     version: "1.0.0",
-    description: "Brand visibility auditing across LLM-facing search indexes (Brave + Exa).",
+    description:
+      "Top Gun GEO Lens helps AI agents, founders, marketers, and SEO teams audit how visible a brand is inside AI search, AI agents, and answer-engine recommendations. " +
+      "Use quick-check to scan a URL, company, product, or topic and return a concise visibility report with ranking signals, content gaps, and recommendations for improving agent discoverability.",
     "x-guidance":
-      "Use GET /api/v1/quick-check?query=<brand> for a fast $0.50 USDC visibility snapshot. " +
-      "Use GET /api/v1/audit?query=<brand> for a full $1.50 USDC audit with citations, LLM index status, and recommendations. " +
-      "Both endpoints require an X-Payment-Token header containing a completed Stripe session ID.",
+      "Use GET /api/v1/quick-check?query=<brand|url|topic> to run a fast GEO visibility audit. " +
+      "Returns a visibility score, ranking signals, content gaps, and recommendations. " +
+      "Requires an X-Payment-Token header containing a completed Stripe session ID ($1.50 USDC per call).",
   },
   paths: {
     "/api/v1/quick-check": {
       get: {
         operationId: "quickCheck",
-        summary: "Quick Check — fast brand visibility snapshot",
+        summary: "Run a fast GEO visibility audit to test whether a brand, website, product, or topic is visible to AI agents and answer engines.",
         tags: ["Visibility"],
         "x-payment-info": {
           price: {
             mode: "fixed",
             currency: "USD",
-            amount: "0.500000",
+            amount: "1.500000",
           },
           protocols: [
             { x402: {} },
@@ -46,7 +48,7 @@ const spec = {
             name: "X-Payment-Token",
             in: "header",
             required: true,
-            description: "Stripe checkout session ID from a completed $0.50 USDC payment",
+            description: "Stripe checkout session ID from a completed $1.50 USDC payment",
             schema: { type: "string" },
           },
         ],
