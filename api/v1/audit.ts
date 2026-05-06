@@ -1,14 +1,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { runAudit } from "../../src/lib/audit.js";
-import { verifyStripeSession, buildX402Required, buildMPPPaymentRequired } from "../../src/lib/payment.js";
+import { verifyStripeSession, buildX402Body, buildTempoHeader } from "../../src/lib/payment.js";
 
-const REALM = "top-gun-mcp-server.vercel.app";
 const RESOURCE = "https://top-gun-mcp-server.vercel.app/api/v1/audit";
+const REALM = "top-gun-mcp-server.vercel.app";
 const AMOUNT = "1.50";
-const AMOUNT_BASE_UNITS = "1500000"; // $1.50 USDC (6 decimals)
+const AMOUNT_BASE_UNITS = "1500000"; // $1.50 USDC — 6 decimals
 const AUDIT_PRICE_CENTS = 150;
 
-const INPUT_SCHEMA = {
+const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
   required: ["query"],
   properties: {
@@ -16,7 +16,7 @@ const INPUT_SCHEMA = {
   },
 };
 
-const OUTPUT_SCHEMA = {
+const OUTPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
   properties: {
     score: { type: "number" },
@@ -27,22 +27,12 @@ const OUTPUT_SCHEMA = {
   },
 };
 
-function send402(res: VercelResponse, paymentUrl: string) {
-  const { header: x402Header, body: x402Body } = buildX402Required(
-    RESOURCE,
-    "TOP GUN GEO-Lens full brand visibility audit with citations, LLM index status, and recommendations.",
-    AMOUNT_BASE_UNITS,
-    INPUT_SCHEMA,
-    OUTPUT_SCHEMA
-  );
-  const { header: mppHeader, body: mppBody } = buildMPPPaymentRequired(
-    REALM,
-    AMOUNT,
-    paymentUrl,
-    "Payment is required to run a Top Gun GEO Lens full audit."
-  );
-  res.setHeader("WWW-Authenticate", `${x402Header}, ${mppHeader}`);
-  return res.status(402).json({ ...x402Body, ...mppBody });
+function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
+  const body = buildX402Body(RESOURCE, "TOP GUN GEO-Lens full brand visibility audit with citations, LLM index status, and recommendations.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA);
+  const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("WWW-Authenticate", `x402 realm="${RESOURCE}", ${tempoHeader}`);
+  return res.status(402).json(body);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

@@ -7,12 +7,16 @@ async function fetchStripeSession(
   sessionId: string,
   stripeSecretKey: string
 ): Promise<StripeSession | null> {
-  const res = await fetch(
-    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
-    { headers: { Authorization: `Bearer ${stripeSecretKey}` } }
-  );
-  if (!res.ok) return null;
-  return res.json() as Promise<StripeSession>;
+  try {
+    const res = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+      { headers: { Authorization: `Bearer ${stripeSecretKey}` } }
+    );
+    if (!res.ok) return null;
+    return res.json() as Promise<StripeSession>;
+  } catch {
+    return null;
+  }
 }
 
 export async function verifyStripeSession(
@@ -31,6 +35,9 @@ export async function verifyStripeSession(
 
 // ── x402 ─────────────────────────────────────────────────────────────────────
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const USDC_BASE_ASSET = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+
 export interface X402Accept {
   scheme: "exact";
   network: "base";
@@ -41,25 +48,24 @@ export interface X402Accept {
   payTo: string;
   maxTimeoutSeconds: number;
   asset: string;
-  extra: { name: string; version: string };
-  inputSchema: object;
-  outputSchema: object;
+  inputSchema: Record<string, unknown>;
+  outputSchema: Record<string, unknown>;
 }
 
 export interface X402PaymentRequired {
   x402Version: 1;
-  error: string;
+  error: "Payment Required";
   accepts: X402Accept[];
 }
 
-export function buildX402Required(
+export function buildX402Body(
   resource: string,
   description: string,
   maxAmountRequired: string,
-  inputSchema: object,
-  outputSchema: object
-): { header: string; body: X402PaymentRequired } {
-  const payTo = process.env["X402_PAY_TO_ADDRESS"] ?? "";
+  inputSchema: Record<string, unknown>,
+  outputSchema: Record<string, unknown>
+): X402PaymentRequired {
+  const payTo = process.env["X402_PAY_TO_ADDRESS"] || ZERO_ADDRESS;
   const accept: X402Accept = {
     scheme: "exact",
     network: "base",
@@ -69,68 +75,33 @@ export function buildX402Required(
     mimeType: "application/json",
     payTo,
     maxTimeoutSeconds: 300,
-    asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC on Base
-    extra: { name: "USD Coin", version: "2" },
+    asset: USDC_BASE_ASSET,
     inputSchema,
     outputSchema,
   };
-  const body: X402PaymentRequired = {
+  return {
     x402Version: 1,
-    error: "X-PAYMENT header is required",
+    error: "Payment Required",
     accepts: [accept],
   };
-  const header = `x402 realm="${resource}"`;
-  return { header, body };
 }
 
-// ── MPP / Tempo ───────────────────────────────────────────────────────────────
+// ── MPP / Tempo (header only) ─────────────────────────────────────────────────
 
-export interface TempoChallenge {
-  method: "tempo";
-  intent: "charge";
-  realm: string;
-  amount: string;
-  currency: "USD";
-  request: string;
-}
-
-export interface MPPPaymentRequired {
-  error: "payment_required";
-  message: string;
-  payment_options: TempoChallenge[];
-  challenges: TempoChallenge[];
-}
-
-export function buildTempoChallenge(
+export function buildTempoHeader(
   realm: string,
   amount: string,
   paymentUrl: string
-): TempoChallenge {
+): string {
   const payload = { method: "tempo", intent: "charge", realm, amount, currency: "USD", paymentUrl };
   const request = btoa(JSON.stringify(payload));
-  return { method: "tempo", intent: "charge", realm, amount, currency: "USD", request };
+  return (
+    `Payment method="tempo" intent="charge" ` +
+    `realm="${realm}" request="${request}"`
+  );
 }
 
-export function buildMPPPaymentRequired(
-  realm: string,
-  amount: string,
-  paymentUrl: string,
-  message: string
-): { header: string; body: MPPPaymentRequired } {
-  const challenge = buildTempoChallenge(realm, amount, paymentUrl);
-  const header =
-    `Payment method="${challenge.method}" intent="${challenge.intent}" ` +
-    `realm="${challenge.realm}" request="${challenge.request}"`;
-  const body: MPPPaymentRequired = {
-    error: "payment_required",
-    message,
-    payment_options: [challenge],
-    challenges: [challenge],
-  };
-  return { header, body };
-}
-
-// Kept for backward compatibility with MCP tool responses
+// Kept for MCP tool text responses
 export function buildPaymentRequired(
   paymentUrl: string,
   amount: string,
