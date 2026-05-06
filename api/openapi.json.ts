@@ -11,7 +11,7 @@ const spec = {
     "x-guidance":
       "Use GET /api/v1/quick-check?query=<brand|url|topic> to run a fast GEO visibility audit. " +
       "Returns a visibility score, ranking signals, content gaps, and recommendations. " +
-      "Requires an X-Payment-Token header containing a completed Stripe session ID ($1.50 USDC per call).",
+      "Requires an X-PAYMENT (x402) or X-Payment-Token (Stripe) header.",
   },
   paths: {
     "/api/v1/quick-check": {
@@ -26,6 +26,14 @@ const spec = {
             amount: "0.500000",
           },
           protocols: [
+            {
+              x402: {
+                scheme: "exact",
+                network: "base",
+                asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                maxAmountRequired: "500000",
+              },
+            },
             {
               tempo: {
                 method: "tempo",
@@ -44,9 +52,14 @@ const spec = {
             schema: { type: "string", minLength: 1 },
           },
           {
+            name: "X-PAYMENT",
+            in: "header",
+            description: "x402 payment proof (base64-encoded)",
+            schema: { type: "string" },
+          },
+          {
             name: "X-Payment-Token",
             in: "header",
-            required: true,
             description: "Stripe checkout session ID from a completed $0.50 USDC payment",
             schema: { type: "string" },
           },
@@ -78,7 +91,7 @@ const spec = {
             },
           },
           "402": {
-            description: "Payment required — complete Stripe checkout and retry with session ID",
+            description: "Payment required",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/PaymentRequired" },
@@ -91,7 +104,7 @@ const spec = {
     "/api/v1/audit": {
       get: {
         operationId: "fullAudit",
-        summary: "Full Audit — deep brand visibility analysis with recommendations",
+        summary: "Full Audit — deep brand visibility analysis with citations, LLM index status, and recommendations.",
         tags: ["Visibility"],
         "x-payment-info": {
           price: {
@@ -100,6 +113,14 @@ const spec = {
             amount: "1.500000",
           },
           protocols: [
+            {
+              x402: {
+                scheme: "exact",
+                network: "base",
+                asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                maxAmountRequired: "1500000",
+              },
+            },
             {
               tempo: {
                 method: "tempo",
@@ -118,9 +139,14 @@ const spec = {
             schema: { type: "string", minLength: 1 },
           },
           {
+            name: "X-PAYMENT",
+            in: "header",
+            description: "x402 payment proof (base64-encoded)",
+            schema: { type: "string" },
+          },
+          {
             name: "X-Payment-Token",
             in: "header",
-            required: true,
             description: "Stripe checkout session ID from a completed $1.50 USDC payment",
             schema: { type: "string" },
           },
@@ -132,15 +158,7 @@ const spec = {
               "application/json": {
                 schema: {
                   type: "object",
-                  required: [
-                    "query",
-                    "score",
-                    "label",
-                    "citations",
-                    "llmIndexStatus",
-                    "recommendations",
-                    "searchedAt",
-                  ],
+                  required: ["query", "score", "label", "citations", "llmIndexStatus", "recommendations", "searchedAt"],
                   properties: {
                     query: { type: "string" },
                     score: { type: "number", minimum: 0, maximum: 100 },
@@ -161,7 +179,7 @@ const spec = {
             },
           },
           "402": {
-            description: "Payment required — complete Stripe checkout and retry with session ID",
+            description: "Payment required",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/PaymentRequired" },
@@ -199,14 +217,12 @@ const spec = {
       },
       PaymentRequired: {
         type: "object",
-        required: ["error", "message", "amount", "currency", "paymentUrl"],
         properties: {
-          error: { type: "string", enum: ["payment_required"] },
-          message: { type: "string" },
-          amount: { type: "string" },
-          currency: { type: "string", enum: ["USDC"] },
-          paymentUrl: { type: "string", format: "uri" },
-          walletAddress: { type: "string" },
+          x402Version: { type: "number" },
+          error: { type: "string" },
+          accepts: { type: "array", items: { type: "object" } },
+          payment_options: { type: "array", items: { type: "object" } },
+          challenges: { type: "array", items: { type: "object" } },
         },
       },
     },

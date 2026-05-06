@@ -1,9 +1,48 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { runQuickCheck } from "../../src/lib/audit.js";
-import { verifyStripeSession, buildMPPPaymentRequired } from "../../src/lib/payment.js";
+import { verifyStripeSession, buildX402Required, buildMPPPaymentRequired } from "../../src/lib/payment.js";
 import { QUICK_CHECK_PRICE_CENTS } from "../../src/tools/quick-check.js";
 
 const REALM = "top-gun-mcp-server.vercel.app";
+const RESOURCE = "https://top-gun-mcp-server.vercel.app/api/v1/quick-check";
+const AMOUNT = "0.50";
+const AMOUNT_BASE_UNITS = "500000"; // $0.50 USDC (6 decimals)
+
+const INPUT_SCHEMA = {
+  type: "object",
+  required: ["query"],
+  properties: {
+    query: { type: "string", description: "Brand name, company, URL, or topic to check" },
+  },
+};
+
+const OUTPUT_SCHEMA = {
+  type: "object",
+  properties: {
+    score: { type: "number" },
+    label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
+    topCitations: { type: "array", items: { type: "object" } },
+    quickTips: { type: "array", items: { type: "string" } },
+  },
+};
+
+function send402(res: VercelResponse, paymentUrl: string) {
+  const { header: x402Header, body: x402Body } = buildX402Required(
+    RESOURCE,
+    "TOP GUN GEO-Lens quick visibility check for a brand, URL, product, or topic.",
+    AMOUNT_BASE_UNITS,
+    INPUT_SCHEMA,
+    OUTPUT_SCHEMA
+  );
+  const { header: mppHeader, body: mppBody } = buildMPPPaymentRequired(
+    REALM,
+    AMOUNT,
+    paymentUrl,
+    "Payment is required to run a Top Gun GEO Lens quick check."
+  );
+  res.setHeader("WWW-Authenticate", `${x402Header}, ${mppHeader}`);
+  return res.status(402).json({ ...x402Body, ...mppBody });
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
@@ -13,16 +52,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const stripeSecretKey = process.env["STRIPE_SECRET_KEY"] ?? "";
   const paymentUrl = process.env["STRIPE_QUICK_CHECK_PAYMENT_URL"] ?? "";
 
-  const paymentToken = req.headers["x-payment-token"];
-  if (!paymentToken || typeof paymentToken !== "string") {
-    const { header, body } = buildMPPPaymentRequired(
-      REALM,
-      "0.50",
-      paymentUrl,
-      "Payment is required to run a Top Gun GEO Lens quick check."
-    );
-    res.setHeader("WWW-Authenticate", header);
-    return res.status(402).json(body);
+  const x402Payment = req.headers["x-payment"];
+  const stripeToken = req.headers["x-payment-token"];
+
+  if (!x402Payment && (!stripeToken || typeof stripeToken !== "string")) {
+    return send402(res, paymentUrl);
   }
 
   const query = req.query["query"];
@@ -30,16 +64,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Missing required query parameter: query" });
   }
 
-  const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey, QUICK_CHECK_PRICE_CENTS);
-  if (!isPaid) {
-    const { header, body } = buildMPPPaymentRequired(
-      REALM,
-      "0.50",
-      paymentUrl,
-      "Payment token invalid or unpaid."
-    );
-    res.setHeader("WWW-Authenticate", header);
-    return res.status(402).json(body);
+  if (stripeToken && typeof stripeToken === "string") {
+    const isPaid = await verifyStripeSession(stripeToken, stripeSecretKey, QUICK_CHECK_PRICE_CENTS);
+    if (!isPaid) return send402(res, paymentUrl);
   }
 
   try {
