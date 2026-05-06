@@ -9,6 +9,7 @@ const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || "";
 const STRIPE_PAYMENT_URL = process.env.STRIPE_PAYMENT_URL || "https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05";
 const BRAVE_KEY = process.env.BRAVE_SEARCH_API_KEY || "";
 const EXA_KEY = process.env.EXA_API_KEY || "";
+const USDC_WALLET_ADDRESS = process.env.USDC_WALLET_ADDRESS || "";
 
 const stripe = STRIPE_KEY ? new Stripe(STRIPE_KEY) : null;
 
@@ -107,7 +108,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const toolName: string | undefined = req.body?.method === "tools/call" ? req.body?.params?.name : undefined;
   if (toolName === "audit_brand_visibility" || toolName === "geo_quick_check") { const ok = await requirePayment(req, res, toolName); if (!ok) return; }
 
-  const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0", description: fullDescription, icons: [{ src: `${SERVER_URL}/top-gun-favicon.png`, type: "image/png", sizes: ["512x512"] }] });
+  // ✅ Fixed: changed `type` to `mimeType` in the icons array
+  const mcp = new McpServer({ name: "top-gun-geo-lens", version: "1.0.0", description: fullDescription, icons: [{ src: `${SERVER_URL}/top-gun-favicon.png`, mimeType: "image/png", sizes: ["512x512"] }] });
 
   mcp.resource("top-gun-tools", "topgun://tools", async () => ({ contents: [{ uri: "topgun://tools", mimeType: "application/json", text: JSON.stringify(toolsAndPricing, null, 2) }] }));
   mcp.resource("top-gun-pricing", "topgun://pricing", async () => ({ contents: [{ uri: "topgun://pricing", mimeType: "application/json", text: JSON.stringify({ tools: [quickTool, auditTool] }, null, 2) }] }));
