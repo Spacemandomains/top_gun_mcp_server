@@ -53,11 +53,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET")     return res.status(405).json({ error: "Method Not Allowed" });
 
-  const query = req.query.query as string;
+  const query = (req.query.url || req.query.query) as string;
   if (!query) {
     return res.status(400).json({
-      error:   "Missing required parameter: query",
-      example: "/api/v1/audit?query=YourBrandName",
+      error:   "Missing required parameter: url",
+      example: "/api/v1/audit?url=https://example.com",
     });
   }
 
