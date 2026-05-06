@@ -8,7 +8,7 @@
       "url": "https://top-gun-mcp-server.vercel.app/top-gun-favicon.png",
       "altText": "Top GUN GEO-Lens API"
     },
-    "guidance": "This API audits brand and topic visibility across Large Language Models. Call GET /api/v1/audit?query=<brand> to receive a visibility score (0-100), top citation URLs, LLM index status, and actionable GEO recommendations. Payment of $1.50 USD is required per request. If no payment credential is provided, the server returns HTTP 402 with payment instructions. Complete payment, then retry with the required payment credential."
+    "guidance": "This API audits brand and topic visibility across Large Language Models. Call GET /api/v1/audit?url=<endpoint> to receive a visibility score (0-100), top citation URLs, LLM index status, and actionable GEO recommendations. Payment of $1.50 USD is required per request. If no payment credential is provided, the server returns HTTP 402 with payment instructions. Complete payment, then retry with the required payment credential."
   },
   "servers": [
     {
@@ -19,28 +19,30 @@
   "paths": {
     "/api/v1/audit": {
       "get": {
-        "summary": "Perform a GEO visibility audit",
-        "operationId": "getGeoAudit",
+        "summary": "Audit MCP tool or endpoint",
+        "operationId": "tool_audit",
+        "description": "Audit an MCP server, OpenAPI spec, or paid AI-agent endpoint for discoverability, schema quality, payment metadata, auth mode, 402 payment challenge quality, and MPP Scan readiness.",
         "x-payment-info": {
           "pricingMode": "fixed",
           "price": "1.50",
           "currency": "USD",
-          "protocols": ["mpp-tempo-1"]
+          "protocols": ["mpp-tempo-1", "stripe-mpp", "x402"]
         },
         "x-payment": {
           "mode": "fixed",
           "amount": "1.50",
           "currency": "USD",
-          "protocols": ["mpp-tempo-1"]
+          "protocols": ["mpp-tempo-1", "stripe-mpp", "x402"]
         },
         "parameters": [
           {
-            "name": "query",
+            "name": "url",
             "in": "query",
-            "description": "The brand or topic to audit for LLM visibility",
+            "description": "The public MCP server, OpenAPI spec, or endpoint URL to audit.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uri"
             }
           }
         ],
@@ -73,7 +75,37 @@
             }
           },
           "402": {
-            "description": "Payment Required - $1.50 USD per request"
+            "description": "Payment Required — $1.50 USD per request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Payment Required" },
+                    "price_usd": { "type": "string", "example": "$1.50" },
+                    "payment_options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "method": { "type": "string" },
+                          "payment_url": { "type": "string" },
+                          "instructions": {}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "x-payment-challenge": {
+              "pricingMode": "fixed",
+              "price": "1.50",
+              "currency": "USD",
+              "protocols": ["mpp-tempo-1", "stripe-mpp", "x402"],
+              "retryHeader": "X-Payment-Token",
+              "x402RetryHeader": "X-Payment"
+            }
           }
         }
       }
