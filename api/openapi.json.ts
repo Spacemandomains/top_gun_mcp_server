@@ -154,15 +154,16 @@ const spec = {
             schema: { type: "string", minLength: 1 },
           },
           {
-            name: "queries",
+            name: "query",
             in: "query",
-            description: "AI search prompts or discovery queries to test (comma-separated)",
-            schema: { type: "string" },
+            required: true,
+            description: "AI search prompt or discovery category to test brand visibility against",
+            schema: { type: "string", minLength: 1 },
           },
           {
             name: "competitors",
             in: "query",
-            description: "Optional competitor brands to compare against (comma-separated)",
+            description: "Optional comma-separated competitor brand names to compare against",
             schema: { type: "string" },
           },
           {
