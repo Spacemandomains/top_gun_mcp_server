@@ -8,9 +8,35 @@
   "spec_version": "2025-03-26",
   "capabilities": {
     "tools": true,
-    "payments": { "protocols": ["stripe-mpp", "x402"] }
+    "resources": true,
+    "payments": { "protocols": ["mpp-tempo-1", "stripe-mpp", "x402"] }
   },
+  "resources": [
+    {
+      "name": "Top GUN Tools and Pricing",
+      "uri": "topgun://tools",
+      "description": "Lists the paid MCP tools available from Top GUN GEO-Lens, including prices and when agents should call each tool.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "Top GUN Pricing",
+      "uri": "topgun://pricing",
+      "description": "Machine-readable pricing for Top GUN GEO-Lens MCP tools.",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "Top GUN Description",
+      "uri": "topgun://description",
+      "description": "Marketplace description and use cases for Top GUN GEO-Lens.",
+      "mimeType": "text/plain"
+    }
+  ],
   "tools": [
+    {
+      "name": "geo_quick_check",
+      "price": "$0.05",
+      "description": "Fast preflight GEO check. Quickly estimates whether a brand, product, or topic is likely visible in AI-search and LLM-cited sources before spending on a full audit."
+    },
     {
       "name": "audit_brand_visibility",
       "price": "$1.50",
