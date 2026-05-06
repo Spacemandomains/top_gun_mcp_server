@@ -1,19 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "public/**",   "use": "@vercel/static" },
-    { "src": "api/**/*.ts", "use": "@vercel/node"   }
-  ],
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "routes": [
-    { "src": "/api/mcp(.*)",      "dest": "/api/mcp/index.ts"     },
-    { "src": "/api/(.*)",         "dest": "/api/$1"               },
-    { "src": "/.well-known/(.*)", "dest": "/public/.well-known/$1"},
-    { "src": "/openapi.json",     "dest": "/public/openapi.json"  },
-    { "src": "/ai-agents.json",   "dest": "/public/ai-agents.json"},
-    { "src": "/llms.txt",         "dest": "/public/llms.txt"      },
-    { "src": "/index.html",       "dest": "/public/index.html"    },
-    { "src": "/top-gun-favicon.png", "dest": "/public/top-gun-favicon.png" },
-    { "src": "/",                 "dest": "/public/index.html"    },
-    { "src": "/(.*)",             "dest": "/public/$1"            }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
