@@ -20,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const paymentToken = req.headers["x-payment-token"];
   if (!paymentToken || typeof paymentToken !== "string") {
     res.setHeader("X-Payment-Required", "true");
-    return res.status(402).json(buildPaymentRequired(paymentUrl, "0.05", walletAddress));
+    return res.status(402).json(buildPaymentRequired(paymentUrl, "0.50", walletAddress));
   }
 
   const isPaid = await verifyStripeSession(paymentToken, stripeSecretKey, QUICK_CHECK_PRICE_CENTS);
