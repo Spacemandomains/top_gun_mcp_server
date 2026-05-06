@@ -1,0 +1,41 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.spacemandomains/top-gun-geo-lens",
+  "title": "Top GUN GEO-Lens MCP Server",
+  "description": "Brand visibility auditing across LLMs. Measures how brands, products, companies, or topics are surfaced and cited by AI systems via Brave Search and Exa, and returns actionable GEO recommendations. Per-call pricing via Stripe MPP and x402.",
+  "version": "1.0.0",
+  "websiteUrl": "https://top-gun-mcp-server.vercel.app",
+  "repository": {
+    "url": "https://github.com/spacemandomains/top_gun_mcp_server",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "url",
+      "identifier": "top-gun-geo-lens",
+      "transport": {
+        "type": "http",
+        "url": "https://top-gun-mcp-server.vercel.app/api/mcp"
+      },
+      "environmentVariables": []
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "keywords": [
+        "geo",
+        "generative engine optimization",
+        "brand visibility",
+        "llm search",
+        "ai search",
+        "seo",
+        "audit",
+        "brave search",
+        "exa",
+        "stripe",
+        "x402",
+        "mpp"
+      ]
+    }
+  }
+}

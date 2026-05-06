@@ -4,8 +4,9 @@
   "description": "Top GUN — GEO-Lens Audit API with MCP wrapper. Brand visibility auditing across LLMs.",
   "type": "module",
   "scripts": {
-    "dev":   "vercel dev",
-    "build": "tsc --noEmit"
+    "dev":      "vercel dev",
+    "build":    "tsc --noEmit",
+    "mpp:scan": "npx -y @agentcash/discovery@latest discover \"https://top-gun-mcp-server.vercel.app\""
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
