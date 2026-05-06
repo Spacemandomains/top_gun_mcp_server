@@ -29,6 +29,62 @@ export async function verifyStripeSession(
   return true;
 }
 
+// ── x402 ─────────────────────────────────────────────────────────────────────
+
+export interface X402Accept {
+  scheme: "exact";
+  network: "base";
+  maxAmountRequired: string;
+  resource: string;
+  description: string;
+  mimeType: "application/json";
+  payTo: string;
+  maxTimeoutSeconds: number;
+  asset: string;
+  extra: { name: string; version: string };
+  inputSchema: object;
+  outputSchema: object;
+}
+
+export interface X402PaymentRequired {
+  x402Version: 1;
+  error: string;
+  accepts: X402Accept[];
+}
+
+export function buildX402Required(
+  resource: string,
+  description: string,
+  maxAmountRequired: string,
+  inputSchema: object,
+  outputSchema: object
+): { header: string; body: X402PaymentRequired } {
+  const payTo = process.env["X402_PAY_TO_ADDRESS"] ?? "";
+  const accept: X402Accept = {
+    scheme: "exact",
+    network: "base",
+    maxAmountRequired,
+    resource,
+    description,
+    mimeType: "application/json",
+    payTo,
+    maxTimeoutSeconds: 300,
+    asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC on Base
+    extra: { name: "USD Coin", version: "2" },
+    inputSchema,
+    outputSchema,
+  };
+  const body: X402PaymentRequired = {
+    x402Version: 1,
+    error: "X-PAYMENT header is required",
+    accepts: [accept],
+  };
+  const header = `x402 realm="${resource}"`;
+  return { header, body };
+}
+
+// ── MPP / Tempo ───────────────────────────────────────────────────────────────
+
 export interface TempoChallenge {
   method: "tempo";
   intent: "charge";
