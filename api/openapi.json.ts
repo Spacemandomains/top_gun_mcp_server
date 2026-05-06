@@ -20,16 +20,16 @@ const spec = {
         "x-payment-info": {
           price: {
             mode: "fixed",
-            currency: "USDC",
+            currency: "USD",
             amount: "0.500000",
           },
           protocols: [
             { x402: {} },
             {
               mpp: {
-                method: "stripe",
-                intent: "payment",
-                currency: "USDC",
+                method: "",
+                intent: "",
+                currency: "",
               },
             },
           ],
@@ -95,16 +95,16 @@ const spec = {
         "x-payment-info": {
           price: {
             mode: "fixed",
-            currency: "USDC",
+            currency: "USD",
             amount: "1.500000",
           },
           protocols: [
             { x402: {} },
             {
               mpp: {
-                method: "stripe",
-                intent: "payment",
-                currency: "USDC",
+                method: "",
+                intent: "",
+                currency: "",
               },
             },
           ],
