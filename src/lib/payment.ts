@@ -35,7 +35,7 @@ export async function verifyStripeSession(
 
 // ── x402 ─────────────────────────────────────────────────────────────────────
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const DEFAULT_PAY_TO = "0xea8B7221507d1A0549e1ab96000a54401A7fDaC1";
 const USDC_BASE_ASSET = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 export interface X402Accept {
@@ -65,7 +65,7 @@ export function buildX402Body(
   inputSchema: Record<string, unknown>,
   outputSchema: Record<string, unknown>
 ): X402PaymentRequired {
-  const payTo = process.env["X402_PAY_TO_ADDRESS"] || ZERO_ADDRESS;
+  const payTo = process.env["X402_PAY_TO_ADDRESS"] || DEFAULT_PAY_TO;
   const accept: X402Accept = {
     scheme: "exact",
     network: "base",
