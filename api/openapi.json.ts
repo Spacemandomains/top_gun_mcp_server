@@ -25,33 +25,14 @@ const spec = {
     "/api/v1/quick-check": {
       post: {
         operationId: "geo_quick_check",
-        summary: "Run a quick GEO visibility check — $0.50 USDC",
-        description: "Checks how visible a brand is for a specific AI search query. Price: $0.50 USDC.",
-        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp", "ai-servers"],
+        tags: ["Search", "GEO"],
+        summary: "Fast GEO-Lens visibility check",
+        description: "Check whether a brand appears in AI search, answer engines, and LLM-style recommendations ($0.50).",
         "x-payment-info": {
-          price: {
-            mode: "fixed",
-            currency: "USD",
-            amount: "0.500000",
-          },
-          protocols: [
-            {
-              x402: {
-                scheme: "exact",
-                network: "base",
-                asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                maxAmountRequired: "500000",
-                resource: "https://top-gun-mcp-server.vercel.app/api/v1/quick-check",
-              },
-            },
-            {
-              tempo: {
-                method: "tempo",
-                intent: "charge",
-                realm: "top-gun-mcp-server.vercel.app",
-              },
-            },
-          ],
+          protocols: ["x402"],
+          pricingMode: "fixed",
+          price: "0.50",
+          currency: "USD",
         },
         requestBody: {
           required: true,
@@ -207,33 +188,14 @@ const spec = {
     "/api/v1/audit": {
       post: {
         operationId: "audit_brand",
-        summary: "Run a full GEO brand audit — $1.50 USDC",
-        description: "Audits brand visibility across AI discovery and search surfaces. Price: $1.50 USDC.",
-        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp", "ai-servers"],
+        tags: ["Search", "GEO"],
+        summary: "Full GEO-Lens brand visibility audit",
+        description: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength ($1.00).",
         "x-payment-info": {
-          price: {
-            mode: "fixed",
-            currency: "USD",
-            amount: "1.500000",
-          },
-          protocols: [
-            {
-              x402: {
-                scheme: "exact",
-                network: "base",
-                asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                maxAmountRequired: "1500000",
-                resource: "https://top-gun-mcp-server.vercel.app/api/v1/audit",
-              },
-            },
-            {
-              tempo: {
-                method: "tempo",
-                intent: "charge",
-                realm: "top-gun-mcp-server.vercel.app",
-              },
-            },
-          ],
+          protocols: ["x402"],
+          pricingMode: "fixed",
+          price: "1.00",
+          currency: "USD",
         },
         requestBody: {
           required: true,
