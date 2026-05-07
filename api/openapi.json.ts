@@ -22,6 +22,88 @@ const spec = {
   ],
   paths: {
     "/api/v1/quick-check": {
+      post: {
+        operationId: "geo_quick_check",
+        summary: "Run a quick GEO visibility check",
+        description: "Checks how visible a brand is for a specific AI search query.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
+        "x-payment-info": {
+          price: {
+            mode: "fixed",
+            currency: "USD",
+            amount: "0.500000",
+          },
+          protocols: [
+            {
+              x402: {
+                scheme: "exact",
+                network: "base",
+                asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                maxAmountRequired: "500000",
+                resource: "https://top-gun-mcp-server.vercel.app/api/v1/quick-check",
+              },
+            },
+            {
+              tempo: {
+                method: "tempo",
+                intent: "charge",
+                realm: "top-gun-mcp-server.vercel.app",
+              },
+            },
+          ],
+        },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["brand", "query"],
+                properties: {
+                  brand: { type: "string", description: "The company or brand name" },
+                  query: { type: "string", description: "The search prompt to test visibility against" },
+                  competitors: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Optional competing brands to compare against",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "GEO quick check result",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["score", "label", "topCitations", "quickTips", "checkedAt"],
+                  properties: {
+                    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
+                    label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
+                    topCitations: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Citation" },
+                    },
+                    quickTips: { type: "array", items: { type: "string" } },
+                    checkedAt: { type: "string", format: "date-time" },
+                  },
+                },
+              },
+            },
+          },
+          "402": {
+            description: "Payment required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/PaymentRequired" },
+              },
+            },
+          },
+        },
+      },
       get: {
         operationId: "geo_quick_check",
         summary: "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.",
@@ -122,6 +204,89 @@ const spec = {
       },
     },
     "/api/v1/audit": {
+      post: {
+        operationId: "audit_brand",
+        summary: "Run a full GEO brand audit",
+        description: "Audits brand visibility across AI discovery and search surfaces.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
+        "x-payment-info": {
+          price: {
+            mode: "fixed",
+            currency: "USD",
+            amount: "1.500000",
+          },
+          protocols: [
+            {
+              x402: {
+                scheme: "exact",
+                network: "base",
+                asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                maxAmountRequired: "1500000",
+                resource: "https://top-gun-mcp-server.vercel.app/api/v1/audit",
+              },
+            },
+            {
+              tempo: {
+                method: "tempo",
+                intent: "charge",
+                realm: "top-gun-mcp-server.vercel.app",
+              },
+            },
+          ],
+        },
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["brand", "query"],
+                properties: {
+                  brand: { type: "string", description: "The company or brand name" },
+                  query: { type: "string", description: "The AI search prompt or discovery category" },
+                  competitors: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Optional competing brands to compare against",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Full GEO brand audit result",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["score", "label", "citations", "llmIndexStatus", "recommendations", "searchedAt"],
+                  properties: {
+                    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
+                    label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
+                    citations: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Citation" },
+                    },
+                    llmIndexStatus: { $ref: "#/components/schemas/LLMIndexStatus" },
+                    recommendations: { type: "array", items: { type: "string" } },
+                    searchedAt: { type: "string", format: "date-time" },
+                  },
+                },
+              },
+            },
+          },
+          "402": {
+            description: "Payment required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/PaymentRequired" },
+              },
+            },
+          },
+        },
+      },
       get: {
         operationId: "audit_brand",
         summary: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength.",
