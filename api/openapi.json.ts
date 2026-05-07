@@ -27,7 +27,7 @@ const spec = {
         operationId: "geo_quick_check",
         tags: ["Search", "GEO"],
         summary: "Fast GEO-Lens visibility check",
-        description: "Check whether a brand appears in AI search, answer engines, and LLM-style recommendations ($0.50).",
+        description: "Check whether a brand appears in AI search, answer engines, and LLM-style recommendations ($0.50 USDC).",
         "x-payment-info": {
           protocols: ["x402"],
           pricingMode: "fixed",
