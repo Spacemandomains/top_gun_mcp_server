@@ -205,6 +205,10 @@ class RegistryHeartbeat {
         // 403 means the endpoint exists but requires an API key — server is reachable
         console.log(`ℹ️  MCPMarket reachable (403 Forbidden — API key required)`);
         return true;
+      } else if (response.status === 429) {
+        // 429 means rate limited — server is alive, we're just pinging too frequently
+        console.log(`ℹ️  MCPMarket reachable (429 Too Many Requests — rate limited)`);
+        return true;
       } else {
         console.warn(`⚠️  MCPMarket responded with ${response.status}`);
         this.recordFailure('mcpmarket');
