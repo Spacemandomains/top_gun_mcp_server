@@ -29,10 +29,38 @@ const OUTPUT_SCHEMA: Record<string, unknown> = {
 };
 
 function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
-  const body = buildX402Body(RESOURCE, "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA);
+  const body = buildX402Body(RESOURCE, "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA) as Record<string, unknown>;
   const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
+
+  const request = Buffer.from(
+    JSON.stringify({
+      resource: RESOURCE,
+      route: "/api/v1/quick-check",
+      amount: AMOUNT,
+      currency: "USD",
+      service: "Top Gun GEO Lens Quick Check",
+      realm: REALM,
+    })
+  ).toString("base64url");
+
+  const challenge = {
+    method: "tempo",
+    intent: "charge",
+    realm: REALM,
+    amount: AMOUNT,
+    currency: "USD",
+    request,
+    payment_url: paymentUrl || undefined,
+  };
+
+  body.payment_options = [challenge];
+  body.challenges = [challenge];
+
   res.setHeader("Content-Type", "application/json");
-  res.setHeader("WWW-Authenticate", `x402 realm="${RESOURCE}", ${tempoHeader}`);
+  res.setHeader(
+    "WWW-Authenticate",
+    `Payment method="tempo" intent="charge" realm="${REALM}" request="${request}", ${tempoHeader}`
+  );
   return res.status(402).json(body);
 }
 
