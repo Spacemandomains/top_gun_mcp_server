@@ -50,6 +50,7 @@ export interface X402Accept {
   asset: string;
   input_schema: Record<string, unknown>;
   output_schema: Record<string, unknown>;
+  schema_url: string;
 }
 
 export interface X402PaymentRequired {
@@ -58,6 +59,7 @@ export interface X402PaymentRequired {
   accepts: X402Accept[];
   input_schema?: Record<string, unknown>;
   output_schema?: Record<string, unknown>;
+  schema_url?: string;
 }
 
 export function buildX402Body(
@@ -68,6 +70,9 @@ export function buildX402Body(
   outputSchema: Record<string, unknown>
 ): X402PaymentRequired {
   const payTo = process.env["X402_PAY_TO_ADDRESS"] || DEFAULT_PAY_TO;
+  const baseUrl = process.env["TOP_GUN_API_URL"] ?? "https://top-gun-mcp-server.vercel.app";
+  const schemaUrl = `${baseUrl}${new URL(resource).pathname}/schema`;
+
   const accept: X402Accept = {
     scheme: "exact",
     network: "base",
@@ -80,6 +85,7 @@ export function buildX402Body(
     asset: USDC_BASE_ASSET,
     input_schema: inputSchema,
     output_schema: outputSchema,
+    schema_url: schemaUrl,
   };
   return {
     x402Version: 1,
@@ -87,6 +93,7 @@ export function buildX402Body(
     accepts: [accept],
     input_schema: inputSchema,
     output_schema: outputSchema,
+    schema_url: schemaUrl,
   };
 }
 
