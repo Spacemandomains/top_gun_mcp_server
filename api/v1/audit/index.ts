@@ -7,6 +7,7 @@ const REALM = "top-gun-mcp-server.vercel.app";
 const AMOUNT = "1.50";
 const AMOUNT_BASE_UNITS = "1500000"; // $1.50 USDC — 6 decimals
 const AUDIT_PRICE_CENTS = 150;
+const USDC_WALLET = "0xea8B7221507d1A0549e1ab96000a54401A7fDaC1";
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
@@ -39,9 +40,12 @@ function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
       resource: RESOURCE,
       route: "/api/v1/audit",
       amount: AMOUNT,
-      currency: "USD",
+      amount_base_units: AMOUNT_BASE_UNITS,
+      currency: "USDC",
       service: "Top Gun GEO Lens Audit",
       realm: REALM,
+      recipient: USDC_WALLET,
+      wallet: USDC_WALLET,
     })
   ).toString("base64url");
 
@@ -50,13 +54,18 @@ function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
     intent: "charge",
     realm: REALM,
     amount: AMOUNT,
-    currency: "USD",
+    amount_base_units: AMOUNT_BASE_UNITS,
+    currency: "USDC",
+    recipient: USDC_WALLET,
+    wallet: USDC_WALLET,
     request,
     payment_url: paymentUrl || undefined,
   };
 
   body.payment_options = [challenge];
   body.challenges = [challenge];
+  body.recipient = USDC_WALLET;
+  body.wallet = USDC_WALLET;
 
   res.setHeader("Content-Type", "application/json");
   res.setHeader(
