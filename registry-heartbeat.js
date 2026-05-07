@@ -127,6 +127,11 @@ class RegistryHeartbeat {
         console.log(`✅ x402scan ping successful (${data.count || 0} services found)`);
         this.recordSuccess('x402scan');
         return true;
+      } else if (response.status === 402) {
+        // 402 Payment Required is the x402 protocol — API is alive and responding correctly
+        console.log(`✅ x402scan reachable (402 Payment Required — API is live)`);
+        this.recordSuccess('x402scan');
+        return true;
       } else {
         console.warn(`⚠️  x402scan responded with ${response.status}`);
         this.recordFailure('x402scan');
@@ -194,8 +199,15 @@ class RegistryHeartbeat {
         this.recordSuccess('mcpmarket');
         return true;
       } else if (response.status === 404) {
-        // Endpoint might not exist, that's okay
         console.log(`ℹ️  MCPMarket heartbeat endpoint not available (404)`);
+        return true;
+      } else if (response.status === 403) {
+        // 403 means the endpoint exists but requires an API key — server is reachable
+        console.log(`ℹ️  MCPMarket reachable (403 Forbidden — API key required)`);
+        return true;
+      } else if (response.status === 429) {
+        // 429 means rate limited — server is alive, we're just pinging too frequently
+        console.log(`ℹ️  MCPMarket reachable (429 Too Many Requests — rate limited)`);
         return true;
       } else {
         console.warn(`⚠️  MCPMarket responded with ${response.status}`);
