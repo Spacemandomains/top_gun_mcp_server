@@ -410,4 +410,4 @@ class RegistryHeartbeat {
   }
 }
 
-module.exports = RegistryHeartbeat;
+export default RegistryHeartbeat;
