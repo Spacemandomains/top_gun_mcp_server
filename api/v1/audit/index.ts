@@ -10,12 +10,8 @@ const AUDIT_PRICE_CENTS = 150;
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  required: ["brand", "query"],
-  properties: {
-    brand: { type: "string", description: "Brand or company name to audit." },
-    query: { type: "string", description: "AI search prompt or discovery category to test brand visibility against." },
-    competitors: { type: "string", description: "Optional comma-separated competitor brand names to compare against." },
-  },
+  properties: {},
+  additionalProperties: true,
 };
 
 const OUTPUT_SCHEMA: Record<string, unknown> = {

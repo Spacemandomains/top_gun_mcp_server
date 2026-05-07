@@ -10,11 +10,8 @@ const AMOUNT_BASE_UNITS = "500000"; // $0.50 USDC — 6 decimals
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  required: ["brand", "query"],
-  properties: {
-    brand: { type: "string", description: "Brand or company name to check." },
-    query: { type: "string", description: "Search or prompt category to test visibility against." },
-  },
+  properties: {},
+  additionalProperties: true,
 };
 
 const OUTPUT_SCHEMA: Record<string, unknown> = {
