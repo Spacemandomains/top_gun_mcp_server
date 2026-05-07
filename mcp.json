@@ -29,33 +29,8 @@
       "description": "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength. Returns score, citations, LLM index status, and recommendations. PRICE: $1.50 USDC. To run this tool: 1) Send the user to https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05 to pay $1.50. 2) Ask for the Stripe session ID they receive after payment. 3) Pass it as paymentToken.",
       "input_schema": {
         "type": "object",
-        "required": ["brand", "query"],
-        "properties": {
-          "brand": {
-            "type": "string",
-            "description": "Brand or company name to audit."
-          },
-          "query": {
-            "type": "string",
-            "description": "AI search prompt or discovery category to test brand visibility against."
-          },
-          "competitors": {
-            "type": "string",
-            "description": "Optional comma-separated competitor brand names to compare against."
-          },
-          "paymentToken": {
-            "type": "string",
-            "description": "Stripe checkout session ID from a completed $1.50 payment at https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05 — required to run the audit."
-          }
-        }
-      }
-    },
-    {
-      "name": "get_payment_info",
-      "description": "Get payment URLs and pricing for both audit tiers. Quick Check: $0.50 at https://buy.stripe.com/00weVd26i1ALcoA9Nd9MY0f — Full Audit: $1.50 at https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05",
-      "input_schema": {
-        "type": "object",
-        "properties": {}
+        "properties": {},
+        "additionalProperties": true
       }
     }
   ]
