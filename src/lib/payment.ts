@@ -60,6 +60,7 @@ export interface X402PaymentRequired {
   input_schema?: Record<string, unknown>;
   output_schema?: Record<string, unknown>;
   schema_url?: string;
+  extensions?: Record<string, unknown>;
 }
 
 export function buildX402Body(
@@ -87,6 +88,21 @@ export function buildX402Body(
     output_schema: outputSchema,
     schema_url: schemaUrl,
   };
+
+  // Bazaar/agentcash discovery extension — library reads inputSchema from:
+  //   extensions.bazaar.schema.properties.input.properties.body  (POST)
+  //   extensions.bazaar.schema.properties.input.properties.queryParams  (GET fallback)
+  const bazaarSchema = {
+    properties: {
+      input: {
+        properties: {
+          body: inputSchema,
+          queryParams: inputSchema,
+        },
+      },
+    },
+  };
+
   return {
     x402Version: 1,
     error: "Payment Required",
@@ -94,6 +110,11 @@ export function buildX402Body(
     input_schema: inputSchema,
     output_schema: outputSchema,
     schema_url: schemaUrl,
+    extensions: {
+      bazaar: {
+        schema: bazaarSchema,
+      },
+    },
   };
 }
 
