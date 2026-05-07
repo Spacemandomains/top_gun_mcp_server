@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { runAudit } from "../../src/lib/audit.js";
-import { verifyStripeSession, buildX402Body, buildTempoHeader } from "../../src/lib/payment.js";
+import { runAudit } from "../../../src/lib/audit.js";
+import { verifyStripeSession, buildX402Body, buildTempoHeader } from "../../../src/lib/payment.js";
 
 const RESOURCE = "https://top-gun-mcp-server.vercel.app/api/v1/audit";
 const REALM = "top-gun-mcp-server.vercel.app";

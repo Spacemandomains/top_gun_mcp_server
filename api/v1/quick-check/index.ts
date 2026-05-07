@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { runQuickCheck } from "../../src/lib/audit.js";
-import { verifyStripeSession, buildX402Body, buildTempoHeader } from "../../src/lib/payment.js";
-import { QUICK_CHECK_PRICE_CENTS } from "../../src/tools/quick-check.js";
+import { runQuickCheck } from "../../../src/lib/audit.js";
+import { verifyStripeSession, buildX402Body, buildTempoHeader } from "../../../src/lib/payment.js";
+import { QUICK_CHECK_PRICE_CENTS } from "../../../src/tools/quick-check.js";
 
 const RESOURCE = "https://top-gun-mcp-server.vercel.app/api/v1/quick-check";
 const REALM = "top-gun-mcp-server.vercel.app";
