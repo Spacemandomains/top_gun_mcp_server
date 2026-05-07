@@ -6,25 +6,8 @@ export default function handler(_req: VercelRequest, res: VercelResponse) {
   return res.status(200).json({
     input_schema: {
       type: "object",
-      required: ["brand", "query"],
-      properties: {
-        brand: {
-          type: "string",
-          description: "Brand or company name to audit.",
-        },
-        query: {
-          type: "string",
-          description: "AI search prompt or discovery category to test brand visibility against.",
-        },
-        competitors: {
-          type: "string",
-          description: "Optional comma-separated competitor brand names.",
-        },
-        paymentToken: {
-          type: "string",
-          description: "Stripe checkout session ID from a completed $1.50 payment.",
-        },
-      },
+      properties: {},
+      additionalProperties: true,
     },
     output_schema: {
       type: "object",

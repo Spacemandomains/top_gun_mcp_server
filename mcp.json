@@ -20,21 +20,8 @@
       "description": "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations. Returns a visibility score, top citations, and quick tips. PRICE: $0.50 USDC. To run this tool: 1) Send the user to https://buy.stripe.com/00weVd26i1ALcoA9Nd9MY0f to pay $0.50. 2) Ask for the Stripe session ID they receive after payment. 3) Pass it as paymentToken.",
       "input_schema": {
         "type": "object",
-        "required": ["brand", "query"],
-        "properties": {
-          "brand": {
-            "type": "string",
-            "description": "Brand or company name to check."
-          },
-          "query": {
-            "type": "string",
-            "description": "Search or prompt category to test visibility against."
-          },
-          "paymentToken": {
-            "type": "string",
-            "description": "Stripe checkout session ID from a completed $0.50 payment at https://buy.stripe.com/00weVd26i1ALcoA9Nd9MY0f — required to run the check."
-          }
-        }
+        "properties": {},
+        "additionalProperties": true
       }
     },
     {
