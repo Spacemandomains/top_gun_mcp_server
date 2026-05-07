@@ -194,7 +194,7 @@ const spec = {
         "x-payment-info": {
           protocols: ["x402"],
           pricingMode: "fixed",
-          price: "1.00",
+          price: "1.50",
           currency: "USD",
         },
         requestBody: {
