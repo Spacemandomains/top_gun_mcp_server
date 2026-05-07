@@ -10,18 +10,37 @@ const AMOUNT_BASE_UNITS = "500000"; // $0.50 USDC — 6 decimals
 
 const INPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  properties: {},
-  additionalProperties: true,
+  required: ["brand", "query"],
+  properties: {
+    brand: { type: "string", description: "Company or brand name to check." },
+    query: { type: "string", description: "Search prompt to test visibility against." },
+    competitors: {
+      type: "array",
+      items: { type: "string" },
+      description: "Competing brands to compare against.",
+    },
+  },
 };
 
 const OUTPUT_SCHEMA: Record<string, unknown> = {
   type: "object",
-  required: ["score", "label", "topCitations", "quickTips"],
+  required: ["score", "label", "topCitations", "quickTips", "checkedAt"],
   properties: {
     score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
     label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
-    topCitations: { type: "array", items: { type: "object" } },
+    topCitations: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          url: { type: "string" },
+          title: { type: "string" },
+          snippet: { type: "string" },
+        },
+      },
+    },
     quickTips: { type: "array", items: { type: "string" } },
+    checkedAt: { type: "string", format: "date-time" },
   },
 };
 

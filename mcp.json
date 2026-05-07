@@ -20,8 +20,16 @@
       "description": "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations. Returns a visibility score, top citations, and quick tips. PRICE: $0.50 USDC. To run this tool: 1) Send the user to https://buy.stripe.com/00weVd26i1ALcoA9Nd9MY0f to pay $0.50. 2) Ask for the Stripe session ID they receive after payment. 3) Pass it as paymentToken.",
       "input_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": true
+        "required": ["brand", "query"],
+        "properties": {
+          "brand": { "type": "string", "description": "Company or brand name to check." },
+          "query": { "type": "string", "description": "Search prompt to test visibility against." },
+          "competitors": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Competing brands to compare against."
+          }
+        }
       }
     },
     {
@@ -29,8 +37,16 @@
       "description": "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength. Returns score, citations, LLM index status, and recommendations. PRICE: $1.50 USDC. To run this tool: 1) Send the user to https://buy.stripe.com/4gMfZh26i5R1dsE1gH9MY05 to pay $1.50. 2) Ask for the Stripe session ID they receive after payment. 3) Pass it as paymentToken.",
       "input_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": true
+        "required": ["brand", "query"],
+        "properties": {
+          "brand": { "type": "string", "description": "Company or brand name to audit." },
+          "query": { "type": "string", "description": "AI search prompt or discovery category to test brand visibility against." },
+          "competitors": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Competing brands to compare against."
+          }
+        }
       }
     }
   ]

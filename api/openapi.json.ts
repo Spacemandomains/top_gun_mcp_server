@@ -23,7 +23,7 @@ const spec = {
   paths: {
     "/api/v1/quick-check": {
       get: {
-        operationId: "quickCheck",
+        operationId: "geo_quick_check",
         summary: "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.",
         tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
         "x-payment-info": {
@@ -67,6 +67,12 @@ const spec = {
             schema: { type: "string", minLength: 1 },
           },
           {
+            name: "competitors",
+            in: "query",
+            description: "Optional comma-separated competitor brand names to compare against",
+            schema: { type: "string" },
+          },
+          {
             name: "X-PAYMENT",
             in: "header",
             description: "x402 payment proof (base64-encoded)",
@@ -86,7 +92,7 @@ const spec = {
               "application/json": {
                 schema: {
                   type: "object",
-                  required: ["score", "label", "topCitations", "quickTips"],
+                  required: ["score", "label", "topCitations", "quickTips", "checkedAt"],
                   properties: {
                     score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
                     label: {
@@ -117,7 +123,7 @@ const spec = {
     },
     "/api/v1/audit": {
       get: {
-        operationId: "fullAudit",
+        operationId: "audit_brand",
         summary: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength.",
         tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
         "x-payment-info": {
@@ -186,7 +192,7 @@ const spec = {
               "application/json": {
                 schema: {
                   type: "object",
-                  required: ["score", "label", "citations", "llmIndexStatus", "recommendations"],
+                  required: ["score", "label", "citations", "llmIndexStatus", "recommendations", "searchedAt"],
                   properties: {
                     score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
                     label: {
@@ -221,7 +227,7 @@ const spec = {
     schemas: {
       Citation: {
         type: "object",
-        required: ["url", "title", "snippet", "source", "position"],
+        required: ["url", "title", "snippet"],
         properties: {
           url: { type: "string", format: "uri" },
           title: { type: "string" },
