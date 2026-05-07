@@ -46,7 +46,7 @@ const OUTPUT_SCHEMA: Record<string, unknown> = {
 };
 
 function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
-  const body = buildX402Body(RESOURCE, "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA) as Record<string, unknown>;
+  const body = buildX402Body(RESOURCE, "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.(.50)", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA) as Record<string, unknown>;
   const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
 
   const request = Buffer.from(
