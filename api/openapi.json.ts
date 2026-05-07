@@ -19,14 +19,15 @@ const spec = {
     { name: "ai-search", description: "AI search and answer engine indexing analysis" },
     { name: "llm", description: "Large Language Model recommendation and citation tracking" },
     { name: "mcp", description: "Model Context Protocol server" },
+    { name: "ai-servers", description: "AI Servers" },
   ],
   paths: {
     "/api/v1/quick-check": {
       post: {
         operationId: "geo_quick_check",
-        summary: "Run a quick GEO visibility check",
-        description: "Checks how visible a brand is for a specific AI search query.",
-        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
+        summary: "Run a quick GEO visibility check — $0.50 USDC",
+        description: "Checks how visible a brand is for a specific AI search query. Price: $0.50 USDC.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp", "ai-servers"],
         "x-payment-info": {
           price: {
             mode: "fixed",
@@ -106,8 +107,8 @@ const spec = {
       },
       get: {
         operationId: "geo_quick_check",
-        summary: "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.",
-        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
+        summary: "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations. Price: $0.50 USDC.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp", "ai-servers"],
         "x-payment-info": {
           price: {
             mode: "fixed",
@@ -206,9 +207,9 @@ const spec = {
     "/api/v1/audit": {
       post: {
         operationId: "audit_brand",
-        summary: "Run a full GEO brand audit",
-        description: "Audits brand visibility across AI discovery and search surfaces.",
-        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
+        summary: "Run a full GEO brand audit — $1.50 USDC",
+        description: "Audits brand visibility across AI discovery and search surfaces. Price: $1.50 USDC.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp", "ai-servers"],
         "x-payment-info": {
           price: {
             mode: "fixed",
@@ -289,8 +290,8 @@ const spec = {
       },
       get: {
         operationId: "audit_brand",
-        summary: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength.",
-        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp"],
+        summary: "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength. Price: $1.50 USDC.",
+        tags: ["brand-visibility", "geo", "ai-search", "llm", "mcp", "ai-servers"],
         "x-payment-info": {
           price: {
             mode: "fixed",
