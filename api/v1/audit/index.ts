@@ -54,7 +54,7 @@ const OUTPUT_SCHEMA: Record<string, unknown> = {
 };
 
 function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
-  const body = buildX402Body(RESOURCE, "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength. ($1.50)", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA) as Record<string, unknown>;
+  const body = buildX402Body(RESOURCE, "Full TOP GUN GEO-Lens brand visibility audit measuring brand visibility, competitor presence, answer-engine positioning, and LLM recommendation strength. ($1.50)", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA) as unknown as Record<string, unknown>;
   const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
 
   const request = Buffer.from(
