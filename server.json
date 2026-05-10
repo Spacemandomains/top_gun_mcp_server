@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.spacemandomains/top-gun-geo-lens",
+  "name": "io.github.Spacemandomains/top-gun-geo-lens",
   "title": "TOP GUN GEO-Lens",
   "description": "Brand visibility auditing across LLMs, AI search, and answer engines with GEO reports and scores.",
   "version": "1.0.0",
