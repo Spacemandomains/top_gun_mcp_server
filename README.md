@@ -1,6 +1,6 @@
 # TOP GUN GEO-Lens — MCP Brand Visibility Auditor
 
-[![MCP Registry](https://img.shields.io/badge/MCP_Registry-Published-blue?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMiAxNWwtNS01IDEuNDEtMS40MUwxMCAxNC4xN2w3LjU5LTcuNTlMMTkgOGwtOSA5eiIvPjwvc3ZnPg==)](https://registry.modelcontextprotocol.io/servers/io.github.Spacemandomains/top-gun-geo-lens)
+[![Publish to MCP Registry](https://github.com/Spacemandomains/top_gun_mcp_server/actions/workflows/publish-mcp.yml/badge.svg)](https://github.com/Spacemandomains/top_gun_mcp_server/actions/workflows/publish-mcp.yml)
 
 > **For AI Agents:** This is an MCP server. Connect it, call its tools, and instantly know whether any brand is visible to LLMs and AI search engines — with actionable recommendations to improve it.
 
