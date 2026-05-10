@@ -1,40 +1,17 @@
 {
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.spacemandomains/top-gun-geo-lens",
-  "description": "TOP GUN GEO-Lens: Brand visibility auditing across LLMs, AI search, and answer engines. Measure how visible any brand is in AI-powered results with scored reports, citations, and actionable GEO recommendations.",
-  "keywords": [
-    "geo",
-    "brand-visibility",
-    "llm",
-    "ai-search",
-    "answer-engine",
-    "audit",
-    "seo",
-    "brave-search",
-    "exa",
-    "generative-engine-optimization"
-  ],
-  "category": "analytics",
-  "author": "spacemandomains",
-  "homepage": "https://github.com/spacemandomains/top_gun_mcp_server",
-  "repository": "https://github.com/spacemandomains/top_gun_mcp_server",
-  "packages": [
+  "title": "TOP GUN GEO-Lens",
+  "description": "Brand visibility auditing across LLMs, AI search, and answer engines with GEO reports and scores.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/spacemandomains/top_gun_mcp_server",
+    "source": "github"
+  },
+  "remotes": [
     {
-      "registry_name": "npm",
-      "name": "top-gun-geo-lens",
-      "version": "1.0.0"
+      "type": "streamable-http",
+      "url": "https://top-gun-mcp-server.vercel.app/api/mcp"
     }
-  ],
-  "_meta": {
-    "io.modelcontextprotocol.registry/publisher-provided": {
-      "transport": "stdio",
-      "pricing": {
-        "geo_quick_check": "$0.05 USDC",
-        "audit_brand": "$1.50 USDC",
-        "get_payment_info": "free"
-      },
-      "tools": ["geo_quick_check", "audit_brand", "get_payment_info"],
-      "runtime": "node",
-      "node_version": ">=18"
-    }
-  }
+  ]
 }
