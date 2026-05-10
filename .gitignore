@@ -3,3 +3,5 @@ dist/
 .env
 .vercel/
 *.log
+mcp-publisher
+mcp-publisher_linux_amd64.tar.gz
