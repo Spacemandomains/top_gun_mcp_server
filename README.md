@@ -2,164 +2,104 @@
 
 [![Publish to MCP Registry](https://github.com/Spacemandomains/top_gun_mcp_server/actions/workflows/publish-mcp.yml/badge.svg)](https://github.com/Spacemandomains/top_gun_mcp_server/actions/workflows/publish-mcp.yml)
 
-> **For AI Agents:** This is an MCP server. Connect it, call its tools, and instantly know whether any brand is visible to LLMs and AI search engines — with actionable recommendations to improve it.
+> **For AI Agents:** This is an MCP server. Connect it, call its tools, and instantly know whether any brand shows up in AI search, answer engines, and LLM-style recommendations — or stays invisible while competitors get cited.
 
 ---
 
 ## What This Does
 
-TOP GUN GEO-Lens measures how visible a brand is across the sources that power AI answers: Brave AI Search, Exa neural search, and LLM-indexed content. It returns a scored report with citations, index status, and concrete GEO (Generative Engine Optimization) recommendations.
+TOP GUN GEO-Lens measures how visible a brand is across the sources that power AI answers: Brave AI Search, Exa, and other engines behind ChatGPT, Perplexity, and Claude.
 
-Use it when an agent needs to answer questions like:
-- *"Is [brand] showing up in AI-powered search results?"*
-- *"Why isn't [brand] being recommended by AI assistants?"*
-- *"What should [brand] do to rank higher in LLM outputs?"*
+- **Brand visibility audit** — How often a brand appears when people ask questions in its category
+- **Quick visibility check** — A fast signal in seconds, before committing to the full audit
+- **Competitor benchmarking** — How the brand stacks up against rivals in AI answers
+- **LLM index status** — Whether the brand's content is indexed and reachable by AI systems
+- **Citations & evidence** — Real URLs and snippets showing exactly where the brand appears (or doesn't)
+- **Recommendations** — Concrete steps to improve AI visibility
 
----
+### Score bands
 
-## Tools
+| Score | Label |
+|------:|-------|
+| 0–100 | Strong (≥ 70) / Moderate (40–69) / Weak (1–39) / Not Visible (0) |
 
-### `geo_quick_check` — $0.05 USDC
-Fast snapshot of brand visibility in AI-indexed sources.
+## MCP Tools
 
-| Output | Detail |
-|--------|--------|
-| Visibility score | 0–100 |
-| Score label | Strong / Moderate / Weak / Not Found |
-| Top 3 citations | URL, title, snippet, source |
-| 2 quick tips | Actionable GEO improvements |
+### `geo_audit` — $1.50 USDC
 
-```json
-{
-  "tool": "geo_quick_check",
-  "query": "Stripe",
-  "paymentToken": "<stripe-session-id>"
-}
-```
+The full audit. Provide a `brand`, a `query` (or category), and optional `competitors`.
 
----
+Returns: visibility score, citations, competitor comparison, LLM index status, recommendations.
 
-### `audit_brand` — $1.50 USDC
-Full brand visibility audit using dual search (Brave + Exa, 10 results each).
+### `geo_quick_check` — $0.50 USDC
 
-| Output | Detail |
-|--------|--------|
-| Visibility score | 0–100 |
-| Score label | Strong / Moderate / Weak / Not Found |
-| Top 5 citations | URL, title, snippet, source, position |
-| LLM index status | Brave indexed, Exa indexed, estimated reach |
-| 6 GEO recommendations | Prioritized, actionable improvements |
+A fast, cheaper signal. Provide a `brand` and `query`.
 
-```json
-{
-  "tool": "audit_brand",
-  "query": "Anthropic",
-  "paymentToken": "<stripe-session-id>"
-}
-```
+Returns: score, label, top citations, quick tips.
 
----
+## Usage
 
-### `get_payment_info` — Free
-Returns payment URLs and USDC wallet address for both tiers. **Call this first** if you don't have a payment token.
-
-```json
-{
-  "tool": "get_payment_info"
-}
-```
-
----
-
-## Agent Workflow
-
-```
-1. Call get_payment_info          → get payment URLs
-2. Direct user to payment link    → user pays $0.05 or $1.50 USDC
-3. User provides Stripe session ID
-4. Call geo_quick_check or audit_brand with paymentToken
-5. Parse structured results       → score, citations, recommendations
-```
-
-If `paymentToken` is omitted, the tool returns a payment link instead of results — no error thrown.
-
----
-
-## Connecting to Claude / MCP Clients
-
-Add to your `claude_desktop_config.json` (or equivalent MCP config):
+Connect this MCP server to Claude Desktop, Cursor, or any MCP-compatible client.
 
 ```json
 {
   "mcpServers": {
     "top-gun-geo-lens": {
-      "command": "node",
-      "args": ["/path/to/top_gun_mcp_server/dist/index.js"],
-      "env": {
-        "STRIPE_SECRET_KEY": "sk_live_...",
-        "STRIPE_PAYMENT_URL": "https://buy.stripe.com/...",
-        "STRIPE_QUICK_CHECK_PAYMENT_URL": "https://buy.stripe.com/...",
-        "BRAVE_SEARCH_API_KEY": "BSA...",
-        "EXA_API_KEY": "...",
-        "USDC_WALLET_ADDRESS": "0x..."
-      }
+      "command": "npx",
+      "args": ["-y", "top-gun-mcp"]
     }
   }
 }
 ```
 
----
+## Pricing
 
-## Setup
+Each tool call is a paid x402 call on Base mainnet (USDC):
+
+| Tool | Price |
+|------|-------|
+| `geo_quick_check` | $0.50 USDC |
+| `geo_audit` | $1.50 USDC |
+
+Pay-per-call: the agent sends an x402 payment with the request. No subscription, no API key needed to call the tools.
+
+## Local Development
 
 ```bash
-git clone https://github.com/spacemandomains/top_gun_mcp_server
-cd top_gun_mcp_server
 npm install
-cp .env.example .env        # fill in your keys
 npm run build
 npm start
 ```
 
-**Required env vars:**
+## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `STRIPE_SECRET_KEY` | Yes | Stripe secret key for payment verification |
-| `STRIPE_PAYMENT_URL` | Yes | Payment link for full audit ($1.50 USDC) |
-| `STRIPE_QUICK_CHECK_PAYMENT_URL` | Yes | Payment link for quick check ($0.05 USDC) |
-| `BRAVE_SEARCH_API_KEY` | No* | Brave Search API key |
-| `EXA_API_KEY` | No* | Exa neural search API key |
-| `USDC_WALLET_ADDRESS` | No | USDC wallet address shown to payers |
+| Variable | Description |
+|----------|-------------|
+| `BRAVE_SEARCH_API_KEY` | Brave Search API key (at least one search key required) |
+| `EXA_API_KEY` | Exa API key |
+| `STRIPE_SECRET_KEY` | Stripe secret key (for payment verification) |
+| `STRIPE_PAYMENT_URL` | Payment link for full audit ($1.50 USDC) |
+| `STRIPE_QUICK_CHECK_PAYMENT_URL` | Payment link for quick check ($0.50 USDC) |
+| `USDC_WALLET_ADDRESS` | USDC wallet address for on-chain payment display |
+| `TOP_GUN_API_URL` | Base URL of the deployed API |
 
-*At least one search API key is required for results.
+> **Payment model:** A paid call is verified before the tool runs (x402) or via a Stripe payment token (`x-payment-token` header). The user pays $0.50 or $1.50 USDC per call, depending on the tool.
 
----
+## Architecture
 
-## Pricing Summary
+```
+┌─────────────┐     MCP      ┌──────────────┐
+│   Claude /  │ ───────────▶ │  TOP GUN MCP │
+│   Cursor /  │              │    Server    │
+│  AI Agent   │ ◀─────────── │  (this repo) │
+└─────────────┘  JSON-RPC    └──────┬───────┘
+                                    │
+                     ┌──────────────┼──────────────┐
+                     ▼              ▼              ▼
+              Brave Search     Exa Search     Stripe / x402
+              (AI answers)   (neural)      (payments)
+```
 
-| Tool | Cost | Best For |
-|------|------|----------|
-| `geo_quick_check` | $0.05 USDC | Quick sanity check, high-volume workflows |
-| `audit_brand` | $1.50 USDC | Deep audit, client reports, GEO strategy |
+## License
 
----
-
-## Tech Stack
-
-- **Runtime:** Node.js ≥ 18, TypeScript
-- **Protocol:** [Model Context Protocol](https://modelcontextprotocol.io) (`@modelcontextprotocol/sdk`)
-- **Search:** Brave Search API + Exa neural search
-- **Payments:** Stripe + USDC on-chain
-- **Deploy:** Vercel-ready
-
----
-
-## For AI Agents — Key Facts
-
-- Transport: `stdio`
-- No streaming — all responses are single text blocks
-- Scores range 0–100; `>= 70` = Strong, `40–69` = Moderate, `1–39` = Weak, `0` = Not Found
-- Payment tokens are Stripe Checkout Session IDs (format: `cs_live_...`)
-- Calling any paid tool without a token returns a structured payment prompt, not an error
-- `audit_brand` is strictly more detailed than `geo_quick_check`; use quick_check for speed/cost, audit for depth
+MIT
