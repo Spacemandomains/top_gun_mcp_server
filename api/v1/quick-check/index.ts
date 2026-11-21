@@ -1,7 +1,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { runQuickCheck } from "../../../src/lib/audit.js";
-import { verifyStripeSession, buildX402Body, buildTempoHeader } from "../../../src/lib/payment.js";
+import { verifyStripeSession, buildTempoHeader } from "../../../src/lib/payment.js";
 import { QUICK_CHECK_PRICE_CENTS } from "../../../src/tools/quick-check.js";
+import {
+  buildChallenge,
+  verifyPayment,
+  settlePayment,
+  paymentHeaderValue,
+  type GateRoute,
+} from "../../../src/lib/x402gate.js";
 
 const RESOURCE = "https://top-gun-mcp-server.vercel.app/api/v1/quick-check";
 const REALM = "top-gun-mcp-server.vercel.app";
@@ -9,44 +16,41 @@ const AMOUNT = "0.50";
 const AMOUNT_BASE_UNITS = "500000"; // $0.50 USDC — 6 decimals
 const USDC_WALLET = "0xea8B7221507d1A0549e1ab96000a54401A7fDaC1";
 
-const INPUT_SCHEMA: Record<string, unknown> = {
-  type: "object",
-  required: ["brand", "query"],
-  properties: {
-    brand: { type: "string", description: "Company or brand name to check." },
-    query: { type: "string", description: "Search prompt to test visibility against." },
-    competitors: {
-      type: "array",
-      items: { type: "string" },
-      description: "Competing brands to compare against.",
-    },
+const INPUT_PROPERTIES: Record<string, unknown> = {
+  brand: { type: "string", description: "Company or brand name to check." },
+  query: { type: "string", description: "Search prompt to test visibility against." },
+  competitors: {
+    type: "array",
+    items: { type: "string" },
+    description: "Competing brands to compare against.",
   },
 };
 
-const OUTPUT_SCHEMA: Record<string, unknown> = {
-  type: "object",
-  required: ["score", "label", "topCitations", "quickTips", "checkedAt"],
-  properties: {
-    score: { type: "number", minimum: 0, maximum: 100, description: "Visibility score (0–100)." },
-    label: { type: "string", enum: ["Strong", "Moderate", "Weak", "Not Found"] },
-    topCitations: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          url: { type: "string" },
-          title: { type: "string" },
-          snippet: { type: "string" },
-        },
+const ROUTE: GateRoute = {
+  resource: RESOURCE,
+  description:
+    "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations.",
+  amountAtomic: AMOUNT_BASE_UNITS,
+  inputExample: { brand: "Nike", query: "best running shoes" },
+  inputProperties: INPUT_PROPERTIES,
+  inputRequired: ["brand", "query"],
+  outputExample: {
+    score: 72,
+    label: "Strong",
+    topCitations: [
+      {
+        url: "https://example.com/review",
+        title: "Example review",
+        snippet: "Nike ranked among the best running shoes.",
       },
-    },
-    quickTips: { type: "array", items: { type: "string" } },
-    checkedAt: { type: "string", format: "date-time" },
+    ],
+    quickTips: ["Publish a comparison guide targeting this prompt."],
+    checkedAt: "2026-01-01T00:00:00.000Z",
   },
 };
 
-function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
-  const body = buildX402Body(RESOURCE, "Fast GEO-Lens visibility check showing whether a brand appears in AI search, answer engines, and LLM-style recommendations. (.50)", AMOUNT_BASE_UNITS, INPUT_SCHEMA, OUTPUT_SCHEMA) as unknown as Record<string, unknown>;
+async function send402(res: VercelResponse, paymentUrl: string): Promise<VercelResponse> {
+  const challenge = await buildChallenge(ROUTE);
   const tempoHeader = buildTempoHeader(REALM, AMOUNT, paymentUrl);
 
   const request = Buffer.from(
@@ -63,7 +67,7 @@ function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
     })
   ).toString("base64url");
 
-  const challenge = {
+  const tempoChallenge = {
     method: "tempo",
     intent: "charge",
     realm: REALM,
@@ -76,12 +80,16 @@ function send402(res: VercelResponse, paymentUrl: string): VercelResponse {
     payment_url: paymentUrl || undefined,
   };
 
-  body.payment_options = [challenge];
-  body.challenges = [challenge];
-  body.recipient = USDC_WALLET;
-  body.wallet = USDC_WALLET;
+  const body = {
+    ...challenge.body,
+    payment_options: [tempoChallenge],
+    challenges: [tempoChallenge],
+    recipient: USDC_WALLET,
+    wallet: USDC_WALLET,
+  };
 
   res.setHeader("Content-Type", "application/json");
+  res.setHeader("PAYMENT-REQUIRED", challenge.header);
   res.setHeader(
     "WWW-Authenticate",
     `Payment method="tempo" intent="charge" realm="${REALM}" request="${request}", ${tempoHeader}`
@@ -93,11 +101,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const stripeSecretKey = process.env["STRIPE_SECRET_KEY"] ?? "";
   const paymentUrl = process.env["STRIPE_QUICK_CHECK_PAYMENT_URL"] ?? "";
 
-  const x402Payment = req.headers["x-payment"];
+  const payHeader = paymentHeaderValue(req.headers);
   const stripeToken = req.headers["x-payment-token"];
 
   // Payment check before method check — all unpaid requests return 402
-  if (!x402Payment && (!stripeToken || typeof stripeToken !== "string")) {
+  if (!payHeader && (!stripeToken || typeof stripeToken !== "string")) {
     return send402(res, paymentUrl);
   }
 
@@ -115,18 +123,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Missing required query parameter: query" });
   }
 
+  const searchQuery = `${brand.trim()} ${query.trim()}`;
+  const run = () =>
+    runQuickCheck(searchQuery, {
+      braveApiKey: process.env["BRAVE_SEARCH_API_KEY"],
+      exaApiKey: process.env["EXA_API_KEY"],
+    });
+
+  // Standard x402 v2 path: verify first, run, settle only on success.
+  if (payHeader) {
+    const verified = await verifyPayment(payHeader, ROUTE);
+    if (!verified.ok) return send402(res, paymentUrl);
+    let result: unknown;
+    try {
+      result = await run();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Quick check failed";
+      return res.status(500).json({ error: "quick_check_failed", message });
+    }
+    const settled = await settlePayment(verified.payload, ROUTE);
+    if (!settled.ok) {
+      return res.status(502).json({ error: "settlement_failed", message: settled.reason });
+    }
+    res.setHeader("PAYMENT-RESPONSE", settled.header);
+    return res.status(200).json(result);
+  }
+
+  // Stripe prepaid path (unchanged).
   if (stripeToken && typeof stripeToken === "string") {
     const isPaid = await verifyStripeSession(stripeToken, stripeSecretKey, QUICK_CHECK_PRICE_CENTS);
     if (!isPaid) return send402(res, paymentUrl);
   }
 
-  const searchQuery = `${brand.trim()} ${query.trim()}`;
-
   try {
-    const result = await runQuickCheck(searchQuery, {
-      braveApiKey: process.env["BRAVE_SEARCH_API_KEY"],
-      exaApiKey: process.env["EXA_API_KEY"],
-    });
+    const result = await run();
     return res.status(200).json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Quick check failed";
