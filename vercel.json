@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/.well-known/x402", "destination": "/api/well-known-x402" }
+  ],
   "crons": [
     {
       "path": "/api/cron/heartbeat",
@@ -12,6 +15,16 @@
         { "key": "Access-Control-Allow-Origin",  "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-MCP-Account, MCP-Session-Id" },
+        { "key": "Access-Control-Max-Age",       "value": "86400" }
+      ]
+    },
+    {
+      "source": "/api/v1/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin",  "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, PAYMENT-SIGNATURE, X-PAYMENT, X-Payment-Token" },
+        { "key": "Access-Control-Expose-Headers", "value": "PAYMENT-REQUIRED, PAYMENT-RESPONSE" },
         { "key": "Access-Control-Max-Age",       "value": "86400" }
       ]
     },
